@@ -2,8 +2,8 @@ import { memo, useEffect } from 'react';
 import { Route, Routes as AppRoutes, BrowserRouter, Router } from 'react-router-dom';
 import { APP_ROUTES } from '../constants';
 import { Authorization, Profile } from '../pages';
-import { useAuthorization } from '../hooks';
 import { useMount } from 'react-use';
+import { useAuthorization } from '..';
 
 export const Routes = memo(() => {
 

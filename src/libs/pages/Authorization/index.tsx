@@ -1,20 +1,20 @@
 import { Form, Formik } from 'formik';
 import { memo } from 'react';
 import { REGISTRATION_INITIAL_VALUES, REGISTRATION_SCHEMA } from '../../constants';
-import { useAuthorization, useUser } from '../../hooks';
 import { FormField } from '../../ui';
 import { useNavigate } from 'react-router';
-
+// import { useAuthorization } from 'libs/hooks';
+// 
 export const Authorization = memo(() => {
 
-    const { registerUser } = useAuthorization()
-    const { user } = useUser()
+    // const { registerUser } = useAuthorization()
+    // const { user } = useUser()
 
-    const navigate = useNavigate()
+    // const navigate = useNavigate()
 
     return (
         <div>
-            <Formik
+            {/* <Formik
                 initialValues={REGISTRATION_INITIAL_VALUES}
                 validationSchema={REGISTRATION_SCHEMA}
                 onSubmit={v => registerUser(v)}
@@ -27,7 +27,7 @@ export const Authorization = memo(() => {
                     <FormField name='password' />
                     <button type='submit'>submit</button>
                 </Form>
-            </Formik>
+            </Formik> */}
         </div>
     );
 });

@@ -1,8 +1,15 @@
 import { Form, Formik } from 'formik';
 import { memo } from 'react';
 import { FormField } from '../../ui';
-import { useAuthorization } from '../../hooks';
 import { REGISTRATION_INITIAL_VALUES, REGISTRATION_SCHEMA } from '../../constants';
+import { useAuthorization } from '../../hooks';
+// import { useAuthorization } from '@/libs/hooks';
+// import { useAuthorization } from 'libs/hooks';
+// import { useAuthorization } from 'libs/hooks';
+// import { useAuthorization } from 'src/libs/hooks';
+// import { useAuthorization } from '@libs';
+
+
 
 export const Registration = memo(() => {
 

@@ -1,17 +1,20 @@
 import './libs/ui/globals.css'
-import { Routes, Theme, UserProvider, } from './libs';
+import { Routes, Theme, UserProvider, AppProvider } from './libs';
 import { BrowserRouter } from 'react-router-dom';
+import AppContext from './libs/contexts/App/AppContext';
 
 function App() {
 
   return (
     <BrowserRouter>
       <Theme>
-        <UserProvider>
-          <div className="App">
-            <Routes />
-          </div>
-        </UserProvider>
+        <AppProvider>
+          <UserProvider>
+            <div className="App">
+              <Routes />
+            </div>
+          </UserProvider>
+        </AppProvider>
       </Theme>
     </BrowserRouter>
   );
