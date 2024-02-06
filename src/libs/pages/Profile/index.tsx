@@ -1,14 +1,15 @@
 import { Form, Formik } from 'formik';
 import { memo, useEffect } from 'react';
 import { FormField } from '../../ui';
-import { GAME_CREATING_INITIAL_VALUES, GAME_CREATING_SCHEMA } from '../../constants';
+import { GAME_CREATING_INITIAL_VALUES, GAME_CREATING_SCHEMA, GAME_JOINING_INITIAL_VALUES, GAME_JOINING_SCHEMA } from '../../constants';
 import { useGameConnection } from '../../hooks/useGameConnection';
 import { useAppInitialization } from '../../hooks';
+import { useAppContext } from '../../contexts';
 
 export const Profile = memo(() => {
 
-    const { createGame } = useGameConnection()
-    const { initializeApplication } = useAppInitialization();
+    const { createGame, joinToGame } = useGameConnection()
+    const { cards, initializeApplication } = useAppContext()
 
     useEffect(() => {
         initializeApplication()
@@ -37,6 +38,19 @@ export const Profile = memo(() => {
                             false
                         </label>
                     </div>
+                    <button type='submit'>submit</button>
+                </Form>
+            </Formik>
+            <Formik
+                initialValues={GAME_JOINING_INITIAL_VALUES}
+                validationSchema={GAME_JOINING_SCHEMA}
+                onSubmit={v => joinToGame(v)}
+                validateOnChange={false}
+                validateOnBlur={false}
+                enableReinitialize
+            >
+                <Form>
+                    <FormField name='code' />
                     <button type='submit'>submit</button>
                 </Form>
             </Formik>

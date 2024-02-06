@@ -21,3 +21,10 @@ export const GAME_CREATING_SCHEMA = Yup.object().shape({
         .max(2000, 'maximum_2000_coins')
         .required('field_is_required'),
 });
+
+export const GAME_JOINING_SCHEMA = Yup.object().shape({
+    code: Yup.string()
+        .min(6, 'minimum_6_charts')
+        .max(6, 'maximum_6_charts')
+        .required('field_is_required'),
+});

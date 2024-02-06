@@ -1,4 +1,5 @@
 export const APP_ROUTES = {
     AUTHORIZATION: '/',
-    PROFILE: '/profile'
+    PROFILE: '/profile',
+    GAME: '/game'
 }

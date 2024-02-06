@@ -1,7 +1,6 @@
 import './libs/ui/globals.css'
 import { Routes, Theme, UserProvider, AppProvider } from './libs';
 import { BrowserRouter } from 'react-router-dom';
-import AppContext from './libs/contexts/App/AppContext';
 
 function App() {
 
@@ -10,9 +9,9 @@ function App() {
       <Theme>
         <AppProvider>
           <UserProvider>
-            <div className="App">
-              <Routes />
-            </div>
+              <div className="App">
+                <Routes />
+              </div>
           </UserProvider>
         </AppProvider>
       </Theme>

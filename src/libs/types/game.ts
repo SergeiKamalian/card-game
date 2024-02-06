@@ -5,12 +5,15 @@ export type TGameCreateRequest = {
     coins: number;
     private: boolean;
 }
-
+export type TGameJoinRequest = {
+    code: string;
+}
 export type TTrump = TCard;
 
 export type TGamer = {
     name: string;
     cards: TCard[];
+    index: number;
 }
 
 export type TGame = {
@@ -21,5 +24,7 @@ export type TGame = {
     private: boolean;
     coins: number;
     code: number;
-    gamers: TGamer[]
+    gamers: TGamer[];
+    defender: string | null;
+    attacker: string | null;
 }

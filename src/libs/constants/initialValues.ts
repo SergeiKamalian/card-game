@@ -7,3 +7,6 @@ export const GAME_CREATING_INITIAL_VALUES = {
     coins: 100,
     private: false
 }
+export const GAME_JOINING_INITIAL_VALUES = {
+    code: ''
+}

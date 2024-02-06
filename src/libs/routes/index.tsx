@@ -1,9 +1,9 @@
 import { memo, useEffect } from 'react';
 import { Route, Routes as AppRoutes, BrowserRouter, Router } from 'react-router-dom';
 import { APP_ROUTES } from '../constants';
-import { Authorization, Profile } from '../pages';
+import { Authorization, Game, Profile } from '../pages';
 import { useMount } from 'react-use';
-import { useAuthorization } from '..';
+import { useAuthorization, useUser } from '..';
 
 export const Routes = memo(() => {
 
@@ -17,6 +17,7 @@ export const Routes = memo(() => {
         <AppRoutes>
             <Route path={APP_ROUTES.AUTHORIZATION} element={<Authorization />} />
             <Route path={APP_ROUTES.PROFILE} element={<Profile />} />
+            <Route path={APP_ROUTES.GAME + '/:id'} element={<Game />} />
         </AppRoutes>
     );
 });

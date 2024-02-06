@@ -3,12 +3,12 @@ import { useFirebase } from "./useFirebase"
 import { COOKIES_KEYS, FIREBASE_PATHS, USER_INITIAL_VALUES } from "../constants"
 import { TUser, TUserForm, TUserRequest } from "../types"
 import { generateSessionToken, generateToken, getCookie, parseToken, setCookie } from "../utils"
-import { useUser } from "./useUser"
+import { useUserContext } from "../contexts"
 
 export const useAuthorization = () => {
 
     const { getData, changeData } = useFirebase()
-    const { changeUser, userAuthStatus } = useUser()
+    const { changeUser, userAuthStatus } = useUserContext()
 
     const checkUserRegistrationStatus = useCallback(async (userName: string) => {
         try {
@@ -34,6 +34,7 @@ export const useAuthorization = () => {
             if (!foundUser) return;
             const sessionToken = generateSessionToken()
             const token = generateToken(foundUser.name, 1, sessionToken);
+
             setCookie(COOKIES_KEYS.ACCESS_TOKEN, token);
             await changeData(FIREBASE_PATHS.AUTHORIZED_USERS, foundUser.name, { sessionToken });
             changeUser(foundUser);
