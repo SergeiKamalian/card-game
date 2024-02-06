@@ -1,17 +1,21 @@
 import { Form, Formik } from 'formik';
 import { memo } from 'react';
 import { FormField } from '../../ui';
+import { useAuthorization } from '../../hooks';
+import { REGISTRATION_INITIAL_VALUES, REGISTRATION_SCHEMA } from '../../constants';
 
-interface RegistrationProps {
-    // Define your props here
-}
+export const Registration = memo(() => {
 
-export const Registration = memo((props: RegistrationProps) => {
+    const { registerUser } = useAuthorization()
+
     return (
         <Formik
-            initialValues={{ name: '', password: '' }}
-            onSubmit={(v) => console.log(v)}
+            initialValues={REGISTRATION_INITIAL_VALUES}
+            validationSchema={REGISTRATION_SCHEMA}
+            onSubmit={(v) => registerUser(v)}
             validateOnChange={false}
+            validateOnBlur={false}
+            enableReinitialize
         >
             <Form>
                 <FormField name='name' />
