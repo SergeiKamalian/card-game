@@ -15,7 +15,7 @@ export const useAuthorization = () => {
             const foundUser = await getData<TUser>(FIREBASE_PATHS.USERS, userName);
             return Boolean(foundUser)
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }, [getData]);
 
@@ -39,7 +39,7 @@ export const useAuthorization = () => {
             await changeData(FIREBASE_PATHS.AUTHORIZED_USERS, foundUser.name, { sessionToken });
             changeUser(foundUser);
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }, [changeData, changeUser, getData]);
 
@@ -60,7 +60,7 @@ export const useAuthorization = () => {
             await changeData(FIREBASE_PATHS.USERS, form.name, requestForm)
             await authorizeUser({ form })
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }, [authorizeUser, changeData, checkUserRegistrationStatus]);
 

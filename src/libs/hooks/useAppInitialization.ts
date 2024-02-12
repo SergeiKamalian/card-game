@@ -13,7 +13,7 @@ export const useAppInitialization = () => {
             const cards = await getCollection<TCard>(FIREBASE_PATHS.CARDS);
             cards && setCards(cards)
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }, [getCollection])
 

@@ -1,9 +1,11 @@
 import { useCallback, useState } from "react"
 import { TUser } from "../types"
 import { APP_ROUTES } from "../constants";
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, } from 'react-router-dom'
 
 export const useUser = () => {
+
+    const { pathname } = useLocation()
 
     const navigate = useNavigate()
 
@@ -13,8 +15,10 @@ export const useUser = () => {
     const changeUser = useCallback((user: TUser | null) => {
         setUser(user);
         setUserAuthStatus(Boolean(user))
-        navigate(APP_ROUTES.PROFILE)
-    }, [navigate])
+        if (pathname === APP_ROUTES.AUTHORIZATION) {
+            navigate(APP_ROUTES.PROFILE)
+        }
+    }, [navigate, pathname])
 
     return {
         userAuthStatus,

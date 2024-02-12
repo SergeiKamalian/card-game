@@ -7,7 +7,5 @@ export const sortCards = (cards: TCard[], trump: TRUMPS) => {
     sortedCards.sort((a, b) => (a.trump.localeCompare(b.trump) || Number(a.value) - Number(b.value)));
     sortedCards.sort((a, b) => (a.trump === trump ? 1 : b.trump === trump ? -1 : 0));
 
-    console.log(sortedCards)
-
     return sortedCards
 }

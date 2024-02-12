@@ -1,6 +1,5 @@
-import { useCallback, useContext } from "react"
-import { useUser } from "./useUser"
-import { TGame, TGameCreateRequest, TGameJoinRequest, TGamer } from "../types"
+import { useCallback } from "react"
+import { TGame, TGameCreateRequest, TGameJoinRequest } from "../types"
 import { generateGameCode, getRandomCards, randomizeTrump, recognizeAttackerAndDefender } from "../utils"
 import { useAppContext, useUserContext } from "../contexts"
 import { useFirebase } from "./useFirebase"
@@ -32,14 +31,15 @@ export const useGameConnection = () => {
                 remainingCards,
                 gamers,
                 attacker: null,
-                defender: null
+                defender: null,
+                inTableCards: '[]'
             }
             await changeData(FIREBASE_PATHS.GAMES, String(requestData.code), requestData)
             navigate(`${APP_ROUTES.GAME}/${requestData.code}`)
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
-    }, [user, cards, changeData])
+    }, [user, cards, changeData, navigate])
 
     const joinToGame = useCallback(async (joiningForm: TGameJoinRequest) => {
         try {
@@ -62,9 +62,9 @@ export const useGameConnection = () => {
             await changeData(FIREBASE_PATHS.GAMES, String(requestData.code), requestData)
             navigate(`${APP_ROUTES.GAME}/${requestData.code}`)
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
-    }, [user])
+    }, [changeData, getData, navigate, user])
 
     return {
         createGame,

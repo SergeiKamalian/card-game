@@ -13,6 +13,9 @@ export const USER_CONTEXT_DEFAULT_VALUES = {
 
 export const GAME_CONTEXT_DEFAULT_VALUES = {
     id: '' as (string | undefined),
-    followToGame: () => {},
-    game: null as (TGame | null)
+    followToGame: () => { },
+    game: null as (TGame | null),
+    handleSelectCard: (card: TCard) => { },
+    defenderSelectedCard: null as TCard | null,
+    closeAttackCardHandler: (inTableCardGroup: TCard[], groupIndex: number) => { }
 }

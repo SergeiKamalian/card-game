@@ -17,7 +17,7 @@ export const useFirebase = () => {
 
             return data as T;
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }, []);
 
@@ -28,7 +28,7 @@ export const useFirebase = () => {
             const data: T[] = querySnapshot.docs.map(doc => doc.data() as T);
             return data;
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
     }, [])
 
@@ -37,7 +37,7 @@ export const useFirebase = () => {
             const collectionRef = doc(database, path, pathSegment);
             await setDoc(collectionRef, data)
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }, []);
 
@@ -46,7 +46,7 @@ export const useFirebase = () => {
             const collectionRef = doc(database, path, pathSegment);
             await deleteDoc(collectionRef)
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }, [])
 
