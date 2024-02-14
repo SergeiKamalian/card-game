@@ -1,13 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router"
-import { TCard, TGame, TGamer } from "../types";
+import { TCard, TGame } from "../types";
 import { doc, onSnapshot } from "firebase/firestore";
 import { database } from "../configs";
 import { FIREBASE_PATHS } from "../constants";
 import { useUserContext } from "../contexts";
-import { checkAttackerCard, checkDefenderCard, getRandomCards } from "../utils";
+import { checkAttackerCard, checkDefenderCard, recognizeAttackerAndDefenderOnFinishLap, removeCardFromDeck, updateGamersOnFinishLap } from "../utils";
 import { useFirebase } from "./useFirebase";
-import { sortCards } from "../utils/sortCards";
 
 export const useGame = () => {
 
@@ -23,14 +22,11 @@ export const useGame = () => {
 
     const [defenderSelectedCard, setDefenderSelectedCard] = useState<TCard | null>(null)
 
-    useEffect(() => console.log(game), [game])
-
     const followToGame = useCallback(() => {
         if (!id) return;
         const unSub = onSnapshot(doc(database, FIREBASE_PATHS.GAMES, id), (doc) => {
-
             const game = doc.data() as TGame;
-
+            //* JSON.parse for Firebase inside arrays issue
             setGame({ ...game, inTableCards: JSON.parse(game?.inTableCards as string || '') as TCard[][] })
         })
         return () => {
@@ -54,19 +50,6 @@ export const useGame = () => {
         }
     }, [changeData, game])
 
-    const filterGamerCards = useCallback((redundantCard: TCard) => {
-        if (!game || !currentGamer) return;
-        return game.gamers.map(gamer => {
-            if (gamer.name === currentGamer.name) {
-                return {
-                    ...gamer,
-                    cards: gamer.cards.filter(({ imageURL }) => imageURL !== redundantCard.imageURL)
-                }
-            }
-            return gamer
-        })
-    }, [currentGamer, game])
-
     const attackHandler = useCallback(async (card: TCard) => {
         try {
             if (!game || !currentGamer) return;
@@ -75,13 +58,13 @@ export const useGame = () => {
                 alert('card is not valid');
                 return;
             }
-            const newGamers = filterGamerCards(card)
+            const newGamers = removeCardFromDeck(game, currentGamer, card)
             const newInTableCards = [...game.inTableCards as TCard[][], [card]];
             await updateGame({ inTableCards: JSON.stringify(newInTableCards), gamers: newGamers })
         } catch (error) {
             console.error(error)
         }
-    }, [currentGamer, filterGamerCards, game, updateGame])
+    }, [currentGamer, game, updateGame])
 
     const handleSelectCard = useCallback((card: TCard) => {
         try {
@@ -94,12 +77,9 @@ export const useGame = () => {
             };
 
             const userIsDefender = game?.defender === user?.name;
-
             if (userIsDefender) {
                 setDefenderSelectedCard(card)
             }
-
-
         } catch (error) {
             console.error(error)
         }
@@ -112,16 +92,17 @@ export const useGame = () => {
                 return;
             }
             if (inTableCardGroup.length !== 1) {
-                alert('card is closed');
+                alert('all cards is closed');
                 return;
             }
-            if (!game?.trump.trump) return;
+            if (!game?.trump.trump || !currentGamer) return;
+
             const isValidCard = checkDefenderCard(defenderSelectedCard, inTableCardGroup[0], game.trump.trump);
             if (!isValidCard) {
                 alert('card is not valid');
                 return;
             }
-            const newGamers = filterGamerCards(defenderSelectedCard)
+            const newGamers = removeCardFromDeck(game, currentGamer, defenderSelectedCard)
             if (!newGamers) return;
             const cloneInTableCards = [...game.inTableCards as TCard[][]];
             cloneInTableCards[groupIndex] = [...inTableCardGroup, defenderSelectedCard];
@@ -134,41 +115,14 @@ export const useGame = () => {
         } catch (error) {
             console.error(error)
         }
-    }, [defenderSelectedCard, filterGamerCards, game, updateGame])
+    }, [currentGamer, defenderSelectedCard, game, updateGame])
 
     const finishTheLap = useCallback(async () => {
         try {
             if (!game) return;
-            console.log('круг закончен')
 
-            const prevDefenderIndex = game?.gamers.find(({ name }) => name === game.defender)?.index || 0; // 1
-            console.log(prevDefenderIndex)
-            const newAttackerIndex = game.defenderSurrendered ? (prevDefenderIndex + 1) === Number(game.gamersCount) ? 0 : prevDefenderIndex + 1 : prevDefenderIndex; // 1
-
-
-            const newAttacker = game.gamers.find(({ index }) => index === newAttackerIndex)?.name;
-            const newDefender = game.gamers.find(({ index }) => {
-                const possibleNewDefenderIndex = newAttackerIndex + 1;
-                const newDefenderIndex = possibleNewDefenderIndex === Number(game.gamersCount) ? 0 : possibleNewDefenderIndex;
-                return index === newDefenderIndex;
-            })?.name;
-
-            const gameNewGamers: TGamer[] = [];
-            let gameRemainingCards = game.remainingCards;
-
-            game.gamers.forEach(gamer => {
-                if (!gameRemainingCards.length) return;
-                if (game.defenderSurrendered && game.defender === gamer.name) {
-                    const inTableCards = (game.inTableCards as TCard[][]).reduce((acc, curr) => acc.concat(curr), []);
-                    const defenderCards = sortCards([...gamer.cards, ...inTableCards], game.trump.trump);
-                    gameNewGamers.push({ ...gamer, cards: defenderCards });
-                    return;
-                }
-
-                const { gamerCards, remainingCards } = getRandomCards(gameRemainingCards, gamer.cards, game.trump);
-                gameNewGamers.push({ ...gamer, cards: gamerCards });
-                gameRemainingCards = remainingCards;
-            })
+            const { attacker: newAttacker, defender: newDefender } = recognizeAttackerAndDefenderOnFinishLap(game);
+            const { gamers: gameNewGamers, remainingCards: gameRemainingCards } = updateGamersOnFinishLap(game);
 
             const updatedGame = {
                 attacker: newAttacker,
@@ -179,7 +133,7 @@ export const useGame = () => {
                 inTableCards: '[]',
                 defenderSurrendered: false
             }
-            console.log(updatedGame)
+
             await updateGame(updatedGame)
 
         } catch (error) {
@@ -190,7 +144,6 @@ export const useGame = () => {
     const transferAttackerPlace = useCallback(async () => {
         try {
             if (!game) return;
-            console.log('следующий игрок')
 
             const prevAttackerIndex = game?.gamers.find(({ name }) => name === game.attacker)?.index || 0;
 
@@ -207,16 +160,15 @@ export const useGame = () => {
         }
     }, [game, updateGame])
 
-    //*  ======================== Бито ========================
     const finishUserTurnHandler = useCallback(async () => {
         try {
             if (!game) return;
-            console.log(game)
+
             const newAlreadyPlayedAttackersCount = game.alreadyPlayedAttackersCount + 1;
-            console.log(newAlreadyPlayedAttackersCount)
-            console.log(game.gamers)
-            if (newAlreadyPlayedAttackersCount === game.gamers.length - 1) {
-                console.log('mtav')
+
+            const allAttackersIsAlreadyPlays = newAlreadyPlayedAttackersCount === game.gamers.length - 1;
+
+            if (allAttackersIsAlreadyPlays) {
                 await finishTheLap()
                 return;
             }

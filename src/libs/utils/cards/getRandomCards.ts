@@ -1,4 +1,4 @@
-import { TCard } from "../types";
+import { TCard } from "../../types";
 import { sortCards } from "./sortCards";
 
 export const getRandomCards = (remainingCards: TCard[], gamerCards: TCard[], trumpCard: TCard) => {

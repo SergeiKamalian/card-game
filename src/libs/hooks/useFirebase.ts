@@ -3,10 +3,6 @@ import { useCallback } from "react"
 import { FIREBASE_PATHS } from "../constants";
 import { database } from "../configs";
 
-// type FirebaseData<T> = {
-//     value: T;
-// };
-
 export const useFirebase = () => {
 
     const getData = useCallback(async <T>(path: FIREBASE_PATHS, pathSegment: string): Promise<T | undefined> => {

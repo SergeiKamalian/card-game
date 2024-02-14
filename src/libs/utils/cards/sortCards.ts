@@ -1,5 +1,5 @@
-import { TRUMPS } from "../constants";
-import { TCard } from "../types";
+import { TRUMPS } from "../../constants";
+import { TCard } from "../../types";
 
 export const sortCards = (cards: TCard[], trump: TRUMPS) => {
     const sortedCards = [...cards]

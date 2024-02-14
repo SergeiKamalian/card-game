@@ -9,9 +9,9 @@ function App() {
       <Theme>
         <AppProvider>
           <UserProvider>
-              <div className="App">
-                <Routes />
-              </div>
+            <div className="App">
+              <Routes />
+            </div>
           </UserProvider>
         </AppProvider>
       </Theme>

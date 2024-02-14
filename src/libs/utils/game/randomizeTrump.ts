@@ -1,4 +1,4 @@
-import { TCard } from "../types";
+import { TCard } from "../../types";
 
 export const randomizeTrump = (cards: TCard[]) => {
     const randomIndex = Math.floor(Math.random() * cards.length);

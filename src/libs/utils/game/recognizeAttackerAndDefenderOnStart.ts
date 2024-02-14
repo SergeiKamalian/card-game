@@ -1,7 +1,7 @@
-import { TRUMPS } from "../constants";
-import { TGamer } from "../types";
+import { TRUMPS } from "../../constants";
+import { TGamer } from "../../types";
 
-export const recognizeAttackerAndDefender = (gamers: TGamer[], trump: TRUMPS) => {
+export const recognizeAttackerAndDefenderOnStart = (gamers: TGamer[], trump: TRUMPS) => {
     const filteredGamers = gamers.map(gamer => {
 
         const filteredCards = gamer.cards.filter(card => card.trump === trump);
