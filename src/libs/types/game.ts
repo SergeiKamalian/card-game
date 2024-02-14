@@ -28,4 +28,6 @@ export type TGame = {
     defender: string | null;
     attacker: string | null;
     inTableCards: TCard[][] | string; // string for firebase issue
+    alreadyPlayedAttackersCount: number;
+    defenderSurrendered: boolean;
 }

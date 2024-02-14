@@ -22,7 +22,7 @@ export const useGameConnection = () => {
             const { gamerCards, remainingCards } = getRandomCards(cards, [], trumpCard);
 
             const gamers = [{ cards: gamerCards, name: user.name, index: 0 }]
-
+            console.log(creatingForm)
             const requestData: TGame = {
                 ...creatingForm,
                 code: gameCode,
@@ -32,7 +32,10 @@ export const useGameConnection = () => {
                 gamers,
                 attacker: null,
                 defender: null,
-                inTableCards: '[]'
+                inTableCards: '[]',
+                alreadyPlayedAttackersCount: 0,
+                defenderSurrendered: false,
+                gamersCount: Number(creatingForm.gamersCount)
             }
             await changeData(FIREBASE_PATHS.GAMES, String(requestData.code), requestData)
             navigate(`${APP_ROUTES.GAME}/${requestData.code}`)
@@ -51,8 +54,11 @@ export const useGameConnection = () => {
             }
             const { gamerCards, remainingCards } = getRandomCards(foundGame.remainingCards, [], foundGame.trump);
             const updatedGamers = [...foundGame.gamers, { cards: gamerCards, name: user.name, index: foundGame.gamers.length }];
-            const started = updatedGamers.length === foundGame.gamersCount;
-            const { attacker, defender } = recognizeAttackerAndDefender(updatedGamers, foundGame.trump.trump)
+            const started = updatedGamers.length === Number(foundGame.gamersCount);
+            console.log(updatedGamers)
+            const { attacker, defender } = recognizeAttackerAndDefender(updatedGamers, foundGame.trump.trump);
+            console.log(attacker)
+            console.log(defender)
             const requestData: TGame = {
                 ...foundGame,
                 gamers: updatedGamers,

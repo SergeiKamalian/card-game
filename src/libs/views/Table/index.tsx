@@ -12,7 +12,7 @@ export const Table = memo((props: TableProps) => {
 
     return (
         <div style={{ display: 'flex', gap: 50 }}>
-            <div>trump: {game?.trump.trump}</div>
+            <div>trump: {game?.trump.trump} count: {game?.remainingCards.length}</div>
             <div>cards:
                 <div>{(game?.inTableCards as TCard[][]).map((cardsGroup, index) => (
                     <div
