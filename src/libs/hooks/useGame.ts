@@ -1,12 +1,13 @@
 import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router"
-import { TCard, TGame } from "../types";
+import { TCard, TGame, TGamer } from "../types";
 import { doc, onSnapshot } from "firebase/firestore";
 import { database } from "../configs";
-import { FIREBASE_PATHS } from "../constants";
-import { useUserContext } from "../contexts";
+import { FIREBASE_PATHS, GAMERS_TIMES, GAMER_STATUSES } from "../constants";
+import { useTimerContext, useUserContext } from "../contexts";
 import { checkAttackerCard, checkDefenderCard, recognizeAttackerAndDefenderOnFinishLap, removeCardFromDeck, updateGamersOnFinishLap } from "../utils";
 import { useFirebase } from "./useFirebase";
+import { useTimer } from "./useTimer";
 
 export const useGame = () => {
 
@@ -14,13 +15,29 @@ export const useGame = () => {
 
     const { user } = useUserContext()
 
+    const { changeGameTimes } = useTimer()
+
     const { changeData } = useFirebase()
 
     const [game, setGame] = useState<TGame | null>(null);
 
     const currentGamer = useMemo(() => game?.gamers.find(({ name }) => name === user?.name), [game?.gamers, user?.name]);
 
-    const [defenderSelectedCard, setDefenderSelectedCard] = useState<TCard | null>(null)
+    const [defenderSelectedCard, setDefenderSelectedCard] = useState<TCard | null>(null);
+
+    const userGamer = useMemo(() => game?.gamers.find(i => i.name === user?.name), [game?.gamers, user?.name]);
+
+    const restGamers = useMemo(() => {
+        const userIndex = game?.gamers.find(({ name }) => name === user?.name)?.index;
+
+        if (typeof userIndex === 'undefined') return [];
+        const [firstPart, secondPart] = game?.gamers.reduce((acc, obj) => {
+            if (obj.index === userIndex) return acc;
+            acc[obj.index < userIndex ? 0 : 1].push(obj);
+            return acc;
+        }, [[], []] as [TGamer[], TGamer[]]) as [TGamer[], TGamer[]];
+        return [...secondPart, ...firstPart]
+    }, [game?.gamers, user?.name]);
 
     const followToGame = useCallback(() => {
         if (!id) return;
@@ -60,11 +77,12 @@ export const useGame = () => {
             }
             const newGamers = removeCardFromDeck(game, currentGamer, card)
             const newInTableCards = [...game.inTableCards as TCard[][], [card]];
-            await updateGame({ inTableCards: JSON.stringify(newInTableCards), gamers: newGamers })
+            await updateGame({ inTableCards: JSON.stringify(newInTableCards), gamers: newGamers });
+            await changeGameTimes({ attackerMinutes: null, defenderMinutes: 1, gameId: String(game.code) })
         } catch (error) {
             console.error(error)
         }
-    }, [currentGamer, game, updateGame])
+    }, [changeGameTimes, currentGamer, game, updateGame])
 
     const handleSelectCard = useCallback((card: TCard) => {
         try {
@@ -111,11 +129,16 @@ export const useGame = () => {
                 gamers: newGamers,
                 inTableCards: JSON.stringify(cloneInTableCards)
             }
-            await updateGame(newGame)
+            await updateGame(newGame);
+
+            const defenderNewMinutes = cloneInTableCards.some(cardGroup => cardGroup.length === 1) ? GAMERS_TIMES.DEFENDER : null;
+            const attackerNewMinutes = cloneInTableCards.some(cardGroup => cardGroup.length === 1) ? null : GAMERS_TIMES.ATTACKER;
+
+            await changeGameTimes({ attackerMinutes: attackerNewMinutes, defenderMinutes: defenderNewMinutes, gameId: String(game.code) });
         } catch (error) {
             console.error(error)
         }
-    }, [currentGamer, defenderSelectedCard, game, updateGame])
+    }, [changeGameTimes, currentGamer, defenderSelectedCard, game, updateGame])
 
     const finishTheLap = useCallback(async () => {
         try {
@@ -135,11 +158,11 @@ export const useGame = () => {
             }
 
             await updateGame(updatedGame)
-
+            await changeGameTimes({ attackerMinutes: GAMERS_TIMES.ATTACKER, gameId: String(game.code) });
         } catch (error) {
             console.error(error)
         }
-    }, [game, updateGame])
+    }, [changeGameTimes, game, updateGame])
 
     const transferAttackerPlace = useCallback(async () => {
         try {
@@ -155,10 +178,11 @@ export const useGame = () => {
             const newAlreadyPlayedAttackersCount = game.alreadyPlayedAttackersCount + 1;
 
             await updateGame({ attacker: readyNewAttacker, alreadyPlayedAttackersCount: newAlreadyPlayedAttackersCount })
+            await changeGameTimes({ attackerMinutes: GAMERS_TIMES.ATTACKER, gameId: String(game.code) });
         } catch (error) {
             console.error(error)
         }
-    }, [game, updateGame])
+    }, [changeGameTimes, game, updateGame])
 
     const finishUserTurnHandler = useCallback(async () => {
         try {
@@ -187,14 +211,48 @@ export const useGame = () => {
         }
     }, [updateGame])
 
+    const suspendAttacker = useCallback(async () => {
+        try {
+            if (!game) return;
+
+            const updatedGamers: TGamer[] = game.gamers.map(gamer => {
+                if (gamer.name === game.attacker) return { ...gamer, status: GAMER_STATUSES.SUSPENDED };
+                return gamer
+            })
+            const filteredGame: TGame = { ...game, gamers: updatedGamers };
+            const { attacker: newAttacker, defender: newDefender } = recognizeAttackerAndDefenderOnFinishLap(filteredGame);
+            const { gamers: gameNewGamers, remainingCards: gameRemainingCards } = updateGamersOnFinishLap(filteredGame);
+
+            const updatedGame = {
+                attacker: newAttacker,
+                defender: newDefender,
+                gamers: gameNewGamers,
+                remainingCards: gameRemainingCards,
+                alreadyPlayedAttackersCount: 0,
+                inTableCards: '[]',
+            }
+
+            alert(`${game.attacker} is left game!`)
+
+            await updateGame(updatedGame)
+            await changeGameTimes({ attackerMinutes: GAMERS_TIMES.ATTACKER, gameId: String(game.code) });
+
+        } catch (error) {
+            console.error(error)
+        }
+    }, [changeGameTimes, game, updateGame])
+
     return {
         id,
         game,
         defenderSelectedCard,
+        userGamer,
+        restGamers,
         followToGame,
         handleSelectCard,
         closeAttackCardHandler,
         finishUserTurnHandler,
-        takeInTableCards
+        takeInTableCards,
+        suspendAttacker
     }
 }

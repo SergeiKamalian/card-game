@@ -1,10 +1,11 @@
 import { useCallback } from "react"
 import { TGame, TGameCreateRequest, TGameJoinRequest } from "../types"
 import { generateGameCode, getRandomCards, randomizeTrump, recognizeAttackerAndDefenderOnStart } from "../utils"
-import { useAppContext, useUserContext } from "../contexts"
+import { useAppContext, useTimerContext, useUserContext } from "../contexts"
 import { useFirebase } from "./useFirebase"
-import { APP_ROUTES, FIREBASE_PATHS } from "../constants"
+import { APP_ROUTES, FIREBASE_PATHS, GAMERS_TIMES, GAMER_STATUSES } from "../constants"
 import { useNavigate } from "react-router"
+import { useTimer } from "./useTimer"
 
 export const useGameConnection = () => {
 
@@ -12,6 +13,7 @@ export const useGameConnection = () => {
     const { cards } = useAppContext()
     const { changeData, getData } = useFirebase()
     const navigate = useNavigate()
+    const { changeGameTimes } = useTimer()
 
     const createGame = useCallback(async (creatingForm: TGameCreateRequest) => {
         try {
@@ -21,7 +23,7 @@ export const useGameConnection = () => {
             const { trump: trumpCard } = randomizeTrump(cards);
             const { gamerCards, remainingCards } = getRandomCards(cards, [], trumpCard);
 
-            const gamers = [{ cards: gamerCards, name: user.name, index: 0 }]
+            const gamers = [{ cards: gamerCards, name: user.name, index: 0, status: GAMER_STATUSES.ACTIVE }]
 
             const requestData: TGame = {
                 ...creatingForm,
@@ -67,7 +69,10 @@ export const useGameConnection = () => {
             }
 
             const { gamerCards, remainingCards } = getRandomCards(foundGame.remainingCards, [], foundGame.trump);
-            const updatedGamers = [...foundGame.gamers, { cards: gamerCards, name: user.name, index: foundGame.gamers.length }];
+            const updatedGamers = [
+                ...foundGame.gamers,
+                { cards: gamerCards, name: user.name, index: foundGame.gamers.length, status: GAMER_STATUSES.ACTIVE }
+            ];
             const started = updatedGamers.length === Number(foundGame.gamersCount);
 
             const { attacker, defender } = recognizeAttackerAndDefenderOnStart(updatedGamers, foundGame.trump.trump);
@@ -78,12 +83,17 @@ export const useGameConnection = () => {
                 remainingCards,
                 ...(started && { started, defender, attacker })
             };
-            await changeData(FIREBASE_PATHS.GAMES, String(requestData.code), requestData)
-            navigate(`${APP_ROUTES.GAME} / ${requestData.code}`)
+
+            await changeData(FIREBASE_PATHS.GAMES, String(requestData.code), requestData);
+            if (started) {
+                console.log('join')
+                changeGameTimes({ attackerMinutes: GAMERS_TIMES.ATTACKER, gameId: joiningForm.code });
+            }
+            navigate(`${APP_ROUTES.GAME}/${requestData.code}`);
         } catch (error) {
             console.error(error)
         }
-    }, [changeData, getData, navigate, user])
+    }, [changeData, changeGameTimes, getData, navigate, user])
 
     return {
         createGame,

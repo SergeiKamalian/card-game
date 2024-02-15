@@ -1,4 +1,4 @@
-import { TCard, TGame, TUser } from "../types";
+import { TCard, TChangeGameTimes, TGame, TGameTimes, TGamer, TUser } from "../types";
 
 export const APP_CONTEXT_DEFAULT_VALUES = {
     initializeApplication: () => { },
@@ -8,7 +8,7 @@ export const APP_CONTEXT_DEFAULT_VALUES = {
 export const USER_CONTEXT_DEFAULT_VALUES = {
     userAuthStatus: false,
     user: null as (TUser | null),
-    changeUser: (user: TUser | null) => { }
+    changeUser: (user: TUser | null) => { },
 }
 
 export const GAME_CONTEXT_DEFAULT_VALUES = {
@@ -19,5 +19,16 @@ export const GAME_CONTEXT_DEFAULT_VALUES = {
     defenderSelectedCard: null as TCard | null,
     closeAttackCardHandler: (inTableCardGroup: TCard[], groupIndex: number) => { },
     finishUserTurnHandler: () => { },
-    takeInTableCards: () => { }
+    takeInTableCards: () => { },
+    userGamer: {} as TGamer | undefined,
+    restGamers: [] as TGamer[],
+    suspendAttacker: () => { }
+}
+
+export const TIMER_CONTEXT_DEFAULT_VALUES = {
+    gameTimes: null as (TGameTimes | null),
+    followTheGameTimes: () => { },
+    changeGameTimes: ({ gameId }: TChangeGameTimes) => { },
+    followTheAttackerTime: () => { },
+    followTheDefenderTime: () => { }
 }

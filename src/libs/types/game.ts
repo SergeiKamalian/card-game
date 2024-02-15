@@ -1,3 +1,4 @@
+import { GAMER_STATUSES } from "../constants";
 import { TCard } from "./card";
 
 export type TGameCreateRequest = {
@@ -14,6 +15,7 @@ export type TGamer = {
     name: string;
     cards: TCard[];
     index: number;
+    status: GAMER_STATUSES
 }
 
 export type TGame = {
@@ -30,4 +32,15 @@ export type TGame = {
     inTableCards: TCard[][] | string; // string for firebase issue
     alreadyPlayedAttackersCount: number;
     defenderSurrendered: boolean;
+}
+
+export type TGameTimes = {
+    attackerFinishTime: string | null;
+    defenderFinishTime: string | null;
+}
+
+export type TChangeGameTimes = {
+    attackerMinutes?: number | null,
+    defenderMinutes?: number | null,
+    gameId: string
 }

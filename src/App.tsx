@@ -1,5 +1,5 @@
 import './libs/ui/globals.css'
-import { Routes, Theme, UserProvider, AppProvider } from './libs';
+import { Routes, Theme, UserProvider, AppProvider, TimerProvider } from './libs';
 import { BrowserRouter } from 'react-router-dom';
 
 function App() {
@@ -9,9 +9,11 @@ function App() {
       <Theme>
         <AppProvider>
           <UserProvider>
-            <div className="App">
-              <Routes />
-            </div>
+            {/* <TimerProvider> */}
+              <div className="App">
+                <Routes />
+              </div>
+            {/* </TimerProvider> */}
           </UserProvider>
         </AppProvider>
       </Theme>
