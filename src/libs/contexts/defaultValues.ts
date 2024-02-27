@@ -4,6 +4,10 @@ export const APP_CONTEXT_DEFAULT_VALUES = {
     initializeApplication: () => { },
     cards: [] as (TCard[] | null)
 }
+export const APP_LOADING_CONTEXT_DEFAULT_VALUES = {
+    appLoading: false,
+    setAppLoading: (loading: boolean) => {}
+}
 
 export const USER_CONTEXT_DEFAULT_VALUES = {
     userAuthStatus: false,

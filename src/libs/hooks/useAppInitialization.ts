@@ -6,7 +6,7 @@ import { TCard } from "../types"
 export const useAppInitialization = () => {
 
     const { getCollection } = useFirebase();
-    const [cards, setCards] = useState<null | TCard[]>(null)
+    const [cards, setCards] = useState<null | TCard[]>(null);
 
     const initializeApplication = useCallback(async () => {
         try {

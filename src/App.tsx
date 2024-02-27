@@ -1,20 +1,32 @@
-import './libs/ui/globals.css'
-import { Routes, Theme, UserProvider, AppProvider, TimerProvider } from './libs';
-import { BrowserRouter } from 'react-router-dom';
+import "./libs/ui/globals.css";
+import {
+  Routes,
+  Theme,
+  UserProvider,
+  AppProvider,
+  Loading,
+  AppLoadingProvider,
+} from "./libs";
+import { BrowserRouter } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
-
   return (
     <BrowserRouter>
       <Theme>
         <AppProvider>
-          <UserProvider>
-            {/* <TimerProvider> */}
+          <AppLoadingProvider>
+            <UserProvider>
+              {/* <TimerProvider> */}
               <div className="App">
+                <Loading />
                 <Routes />
               </div>
-            {/* </TimerProvider> */}
-          </UserProvider>
+              <ToastContainer />
+              {/* </TimerProvider> */}
+            </UserProvider>
+          </AppLoadingProvider>
         </AppProvider>
       </Theme>
     </BrowserRouter>

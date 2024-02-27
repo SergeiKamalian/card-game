@@ -72,7 +72,7 @@ export const useGame = () => {
             if (!game || !currentGamer) return;
             const isValidCard = checkAttackerCard(card, game?.inTableCards as TCard[][] || []);
             if (!isValidCard) {
-                alert('card is not valid');
+                console.log('card is not valid');
                 return;
             }
             const newGamers = removeCardFromDeck(game, currentGamer, card)
@@ -106,18 +106,18 @@ export const useGame = () => {
     const closeAttackCardHandler = useCallback(async (inTableCardGroup: TCard[], groupIndex: number) => {
         try {
             if (!defenderSelectedCard) {
-                alert('select card')
+                console.log('select card')
                 return;
             }
             if (inTableCardGroup.length !== 1) {
-                alert('all cards is closed');
+                console.log('all cards is closed');
                 return;
             }
             if (!game?.trump.trump || !currentGamer) return;
 
             const isValidCard = checkDefenderCard(defenderSelectedCard, inTableCardGroup[0], game.trump.trump);
             if (!isValidCard) {
-                alert('card is not valid');
+                console.log('card is not valid');
                 return;
             }
             const newGamers = removeCardFromDeck(game, currentGamer, defenderSelectedCard)
@@ -232,7 +232,7 @@ export const useGame = () => {
                 inTableCards: '[]',
             }
 
-            alert(`${game.attacker} is left game!`)
+            console.log(`${game.attacker} is left game!`)
 
             await updateGame(updatedGame)
             await changeGameTimes({ attackerMinutes: GAMERS_TIMES.ATTACKER, gameId: String(game.code) });

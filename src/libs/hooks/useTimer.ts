@@ -39,7 +39,7 @@ export const useTimer = () => {
 
             const attackerFinishTime = new Date(gameTimes.defenderFinishTime);
             const currentTime = new Date();
-            if (currentTime > attackerFinishTime) alert('left!')
+            if (currentTime > attackerFinishTime) console.log('left!')
         }
         const id = setInterval(checkDefenderFinishTime, 5000);
         return () => clearInterval(id);

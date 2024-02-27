@@ -54,17 +54,17 @@ export const useGameConnection = () => {
             const foundGame = await getData<TGame>(FIREBASE_PATHS.GAMES, joiningForm.code);
 
             if (!foundGame) {
-                alert(`game with ${joiningForm.code} is not found`)
+                console.log(`game with ${joiningForm.code} is not found`)
                 return;
             }
 
             if (foundGame.coins > user.coins) {
-                alert(`you don't have that many coins`)
+                console.log(`you don't have that many coins`)
                 return;
             }
 
             if (Number(foundGame.gamersCount) === foundGame.gamers.length) {
-                alert(`game with ${joiningForm.code} is crowded with players`)
+                console.log(`game with ${joiningForm.code} is crowded with players`)
                 return;
             }
 

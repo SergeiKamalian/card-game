@@ -1,7 +1,6 @@
 import { Formik } from "formik";
 import { memo, useCallback } from "react";
 import { Button, FormField, Text, Wrapper } from "../../ui";
-import { LuUserCircle } from "react-icons/lu";
 import {
   REGISTRATION_INITIAL_VALUES,
   REGISTRATION_SCHEMA,
@@ -12,17 +11,18 @@ import {
   StyledRegistrationButtonWrapper,
   StyledRegistrationForm,
 } from "./styles";
+import { LuKeyRound } from "react-icons/lu";
 
 interface RegistrationProps {
   setIsRegistrationView: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const Registration = memo(
+export const Authorization = memo(
   ({ setIsRegistrationView }: RegistrationProps) => {
     const { registerUser } = useAuthorization();
     const theme = useTheme();
-    const goToSignIn = useCallback(
-      () => setIsRegistrationView(false),
+    const goToRegistration = useCallback(
+      () => setIsRegistrationView(true),
       [setIsRegistrationView]
     );
 
@@ -33,13 +33,13 @@ export const Registration = memo(
         direction="column"
         minWidth="450px"
         gap={20}
-        borderRadius="30px"
         withBoxShadow
+        borderRadius="30px"
       >
         <Wrapper alignItems="center" gap={10}>
-          <LuUserCircle color={theme.colors.white} size={30} />
+          <LuKeyRound color={theme.colors.white} size={30} />
           <Text color={theme.colors.white} fz={35} fw={600}>
-            Registration
+            Authorization
           </Text>
         </Wrapper>
         <Formik
@@ -61,20 +61,20 @@ export const Registration = memo(
             <StyledRegistrationButtonWrapper>
               <Button size="big" btnType="submit">
                 <Text fz={20} fw={500}>
-                  Register
+                  Sign in
                 </Text>
               </Button>
               <div>
-                <Text fz={14}>I have an account,</Text>
+                <Text fz={14}>I don't have an account,</Text>
                 <Text
                   fz={14}
                   fw={600}
                   color={theme.colors.link}
                   cursor="pointer"
-                  onClick={goToSignIn}
                   decoration="underline"
+                  onClick={goToRegistration}
                 >
-                  Sign in
+                  Register
                 </Text>
               </div>
             </StyledRegistrationButtonWrapper>
@@ -84,5 +84,3 @@ export const Registration = memo(
     );
   }
 );
-
-Registration.displayName = "Registration";

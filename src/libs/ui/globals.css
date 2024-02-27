@@ -2,4 +2,27 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: "Poppins";
+}
+
+button,
+input {
+    border: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+}
+
+#root {
+    width: 100vw;
+    height: 100svh;
+    overflow: hidden;
+    background: radial-gradient(circle, #22242f, #12141e);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.Toastify >div {
+    width: fit-content;
 }
