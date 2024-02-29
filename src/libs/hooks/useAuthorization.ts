@@ -46,8 +46,12 @@ export const useAuthorization = () => {
         let foundUser = null;
         if (!currentUser && form) {
           foundUser = await getData<TUser>(FIREBASE_PATHS.USERS, form.name);
+          if (!foundUser) {
+            notification("User not found!", "error");
+            return;
+          }
           if (foundUser?.password !== form.password) {
-            console.log("password is wrong!");
+            notification("Password is wrong!", "error");
             return;
           }
         } else {
@@ -62,6 +66,7 @@ export const useAuthorization = () => {
           sessionToken,
         });
         changeUser(foundUser);
+        notification("You have successfully logged in!", "success");
       } catch (error) {
         console.error(error);
       }
@@ -72,7 +77,7 @@ export const useAuthorization = () => {
   const registerUser = useCallback(
     async (form: TUserForm) => {
       try {
-        setAppLoading(true)
+        setAppLoading(true);
         const userWithFormNameIsFound = await checkUserRegistrationStatus(
           form.name
         );
@@ -93,7 +98,7 @@ export const useAuthorization = () => {
       } catch (error) {
         console.error(error);
       } finally {
-        setAppLoading(false)
+        setAppLoading(false);
       }
     },
     [authorizeUser, changeData, checkUserRegistrationStatus, setAppLoading]
@@ -131,6 +136,7 @@ export const useAuthorization = () => {
 
   return {
     registerUser,
+    authorizeUser,
     checkUserAuthStatus,
   };
 };

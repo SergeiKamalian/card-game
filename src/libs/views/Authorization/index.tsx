@@ -19,7 +19,7 @@ interface RegistrationProps {
 
 export const Authorization = memo(
   ({ setIsRegistrationView }: RegistrationProps) => {
-    const { registerUser } = useAuthorization();
+    const { authorizeUser } = useAuthorization();
     const theme = useTheme();
     const goToRegistration = useCallback(
       () => setIsRegistrationView(true),
@@ -45,7 +45,7 @@ export const Authorization = memo(
         <Formik
           initialValues={REGISTRATION_INITIAL_VALUES}
           validationSchema={REGISTRATION_SCHEMA}
-          onSubmit={(v) => registerUser(v)}
+          onSubmit={(v) => authorizeUser({ form: v })}
           validateOnChange={false}
           validateOnBlur={false}
           enableReinitialize
