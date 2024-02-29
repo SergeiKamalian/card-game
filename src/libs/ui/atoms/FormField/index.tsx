@@ -18,8 +18,8 @@ export const FormField = memo((props: FormFieldProps) => {
   const theme = useTheme()
 
   return (
-    <StyledFormFieldWrapper>
-      {label ? <Text fz={16}>{label}</Text> : null}
+    <StyledFormFieldWrapper className="form-field">
+      {label ? <Text id='field-label' fz={16}>{label}</Text> : null}
       <StyledFormField>
         <Field {...props} id="field" />
       </StyledFormField>

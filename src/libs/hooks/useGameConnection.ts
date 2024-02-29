@@ -27,6 +27,7 @@ export const useGameConnection = () => {
 
             const requestData: TGame = {
                 ...creatingForm,
+                private: creatingForm.private === 'true',
                 code: gameCode,
                 started: false,
                 trump: trumpCard,

@@ -56,7 +56,7 @@ const StyledLoader = styled.div`
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    border-left: ${(p) => `4px solid ${p.theme.colors.link}`};
+    border-left: ${(p) => `4px solid ${p.theme.colors.purple3}`};
     border-bottom: 4px solid transparent;
     animation: ${rotate} 0.5s linear infinite reverse;
   }

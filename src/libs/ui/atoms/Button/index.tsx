@@ -24,6 +24,8 @@ export interface ButtonProps
   btnType?: "submit" | "button" | "reset";
   className?: string;
   children: ReactNode;
+  isCircle?: boolean;
+  circleSize?: number;
 }
 
 export const Button: FC<ButtonProps> = (props) => {
@@ -33,10 +35,9 @@ export const Button: FC<ButtonProps> = (props) => {
     success,
     disabled,
     size = "normal",
-    // leftIcon,
-    // rightIcon,
-    // iconSize = 30,
     btnType = undefined,
+    isCircle,
+    circleSize,
     children,
     ...rest
   } = props;
@@ -47,8 +48,10 @@ export const Button: FC<ButtonProps> = (props) => {
       type={btnType}
       themeType={type}
       size={size}
+      isCircle={isCircle}
+      circleSize={circleSize}
     >
-      <StyledButtonContent>{children}</StyledButtonContent>
+      <StyledButtonContent type={type}>{children}</StyledButtonContent>
     </StyledButton>
   );
 };

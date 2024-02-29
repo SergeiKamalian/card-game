@@ -5,7 +5,7 @@ export type TUserAdditionalInformation = {
     coins: number;
     friendsCount: TFriendsCount;
     messagesCount: number;
-    avatarURL: string | null;
+    avatarURL: string;
 }
 
 export interface TUser extends TUserAdditionalInformation {

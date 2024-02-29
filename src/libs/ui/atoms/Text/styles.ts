@@ -15,9 +15,13 @@ const baseStyles = css<{
   width?: string;
   fw?: number;
   cursor?: string;
+  lh?: number;
+  ls?: number;
 }>`
   ${({ fz }) => fz && ` font-size: ${fz}px`};
   ${({ fw }) => fw && ` font-weight: ${fw}`};
+  ${({ ls }) => ls && ` letter-spacing: ${ls}px`};
+  ${({ lh }) => lh && ` line-height: ${lh}px`};
   color: ${({ color, theme }) => color || theme.colors.white};
   font-style: ${({ fs }) => fs || 'normal'};
   text-align: ${({ align }) => align || 'left'};

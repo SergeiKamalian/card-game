@@ -6,7 +6,9 @@ export const APP_CONTEXT_DEFAULT_VALUES = {
 }
 export const APP_LOADING_CONTEXT_DEFAULT_VALUES = {
     appLoading: false,
-    setAppLoading: (loading: boolean) => {}
+    setAppLoading: (loading: boolean) => {},
+    isInitLoading: true,
+    setIsInitLoading: (loading: boolean) => {},
 }
 
 export const USER_CONTEXT_DEFAULT_VALUES = {

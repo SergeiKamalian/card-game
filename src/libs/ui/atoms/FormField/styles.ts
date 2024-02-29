@@ -23,7 +23,7 @@ export const StyledFormFieldWrapper = styled.div`
     flex-direction: column;
     gap: 2px;
 
-    >:first-child {
+    #field-label {
         margin-left: 10px;
     }
 

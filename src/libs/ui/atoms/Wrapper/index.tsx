@@ -4,7 +4,7 @@ import { StyledWrapper } from "./styles";
 
 interface WrapperProps {
   background?: string;
-  padding?: number;
+  padding?: string;
   direction?: "row" | "column";
   gap?: number;
   minWidth?: string;
@@ -12,13 +12,14 @@ interface WrapperProps {
   children: ReactNode;
   borderRadius?: string;
   withBoxShadow?: boolean;
-  alignItems?: 'center' | 'auto'
+  alignItems?: 'center' | 'auto';
+  justifyContent?: 'center' | 'auto';
 }
 
 export const Wrapper: FC<WrapperProps> = memo((props) => {
   const {
     background,
-    padding = 10,
+    padding = '10px',
     direction = "row",
     gap = 5,
     minHeight,
@@ -26,7 +27,8 @@ export const Wrapper: FC<WrapperProps> = memo((props) => {
     children,
     borderRadius,
     withBoxShadow = false,
-    alignItems = 'auto'
+    alignItems = 'auto',
+    justifyContent = 'auto'
   } = props;
 
   return (
@@ -40,6 +42,7 @@ export const Wrapper: FC<WrapperProps> = memo((props) => {
       $borderRadius={borderRadius || 'none'}
       $withBoxShadow={withBoxShadow}
       $alignItems={alignItems}
+      $justifyContent={justifyContent}
     >
       {children}
     </StyledWrapper>

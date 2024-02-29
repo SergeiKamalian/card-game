@@ -1,3 +1,5 @@
 export * from './atoms'
 export * from './other'
 export * from './functions'
+export * from './organisms'
+export * from './molecules'

@@ -21,6 +21,8 @@ export interface TextProps
   className?: string;
   children: ReactNode;
   cursor?: string;
+  lh?: number;
+  ls?: number;
 }
 export const Text: FC<TextProps> = (props) => {
   const { type = 'p', children, ...rest } = props;

@@ -20,7 +20,7 @@ import { notification } from "../ui";
 export const useAuthorization = () => {
   const { getData, changeData } = useFirebase();
   const { changeUser, userAuthStatus } = useUserContext();
-  const { setAppLoading } = useAppLoadingContext();
+  const { setAppLoading, setIsInitLoading } = useAppLoadingContext();
 
   const checkUserRegistrationStatus = useCallback(
     async (userName: string) => {
@@ -43,6 +43,7 @@ export const useAuthorization = () => {
       currentUser?: TUser;
     }) => {
       try {
+        setAppLoading(true);
         let foundUser = null;
         if (!currentUser && form) {
           foundUser = await getData<TUser>(FIREBASE_PATHS.USERS, form.name);
@@ -69,9 +70,11 @@ export const useAuthorization = () => {
         notification("You have successfully logged in!", "success");
       } catch (error) {
         console.error(error);
+      } finally {
+        setAppLoading(false);
       }
     },
-    [changeData, changeUser, getData]
+    [changeData, changeUser, getData, setAppLoading]
   );
 
   const registerUser = useCallback(
@@ -105,34 +108,40 @@ export const useAuthorization = () => {
   );
 
   const checkUserAuthStatus = useCallback(async () => {
-    if (userAuthStatus) return;
-    const token = getCookie(COOKIES_KEYS.ACCESS_TOKEN);
-    if (!token) {
-      console.log("not found");
-      return;
-    }
-    const [userName, authStatusFinishDateValue, sessionToken] =
-      parseToken(token);
+    try {
+      if (userAuthStatus) return;
+      const token = getCookie(COOKIES_KEYS.ACCESS_TOKEN);
+      if (!token) {
+        console.log("not found");
+        return;
+      }
+      const [userName, authStatusFinishDateValue, sessionToken] =
+        parseToken(token);
 
-    const authStatusMaxDate = new Date(authStatusFinishDateValue);
-    const currentTime = new Date();
+      const authStatusMaxDate = new Date(authStatusFinishDateValue);
+      const currentTime = new Date();
 
-    if (currentTime > authStatusMaxDate) {
-      console.log("time is finish");
-      return;
-    }
+      if (currentTime > authStatusMaxDate) {
+        console.log("time is finish");
+        return;
+      }
 
-    const foundAuthorizedUser = await getData<{ sessionToken: string }>(
-      FIREBASE_PATHS.AUTHORIZED_USERS,
-      userName
-    );
-    if (sessionToken !== foundAuthorizedUser?.sessionToken) {
-      console.log("tokens is not equal");
-      return;
+      const foundAuthorizedUser = await getData<{ sessionToken: string }>(
+        FIREBASE_PATHS.AUTHORIZED_USERS,
+        userName
+      );
+      if (sessionToken !== foundAuthorizedUser?.sessionToken) {
+        console.log("tokens is not equal");
+        return;
+      }
+      const foundedUser = await getData<TUser>(FIREBASE_PATHS.USERS, userName);
+      foundedUser && (await authorizeUser({ currentUser: foundedUser }));
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsInitLoading(false);
     }
-    const foundedUser = await getData<TUser>(FIREBASE_PATHS.USERS, userName);
-    foundedUser && (await authorizeUser({ currentUser: foundedUser }));
-  }, [authorizeUser, getData, userAuthStatus]);
+  }, [authorizeUser, getData, setIsInitLoading, userAuthStatus]);
 
   return {
     registerUser,

@@ -5,6 +5,7 @@ import { GAME_CREATING_INITIAL_VALUES, GAME_CREATING_SCHEMA, GAME_JOINING_INITIA
 import { useGameConnection } from '../../hooks/useGameConnection';
 import { useAppInitialization } from '../../hooks';
 import { useAppContext } from '../../contexts';
+import { ProfileComponent } from '../../views';
 
 export const Profile = memo(() => {
 
@@ -14,6 +15,8 @@ export const Profile = memo(() => {
     useEffect(() => {
         initializeApplication()
     }, [initializeApplication])
+
+    return <ProfileComponent />
 
     return (
         <div>

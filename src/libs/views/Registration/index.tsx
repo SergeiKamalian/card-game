@@ -29,7 +29,7 @@ export const Registration = memo(
     return (
       <Wrapper
         background={theme.gradients.form}
-        padding={20}
+        padding='20px'
         direction="column"
         minWidth="450px"
         gap={20}

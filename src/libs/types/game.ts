@@ -4,7 +4,7 @@ import { TCard } from "./card";
 export type TGameCreateRequest = {
     gamersCount: number;
     coins: number;
-    private: boolean;
+    private: string;
 }
 export type TGameJoinRequest = {
     code: string;
