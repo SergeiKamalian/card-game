@@ -13,6 +13,6 @@ export const StyledProfileControl = styled.div`
     justify-content: space-between;
 
     >:first-child {
-        width: 190px;
+        min-width: 190px;
     }
 `
