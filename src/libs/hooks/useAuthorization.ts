@@ -85,7 +85,7 @@ export const useAuthorization = () => {
           form.name
         );
         if (userWithFormNameIsFound) {
-          console.log("user is found");
+          notification('A player with that name exists!', 'error')
           return;
         }
 
