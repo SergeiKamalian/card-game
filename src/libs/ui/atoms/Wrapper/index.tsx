@@ -13,7 +13,7 @@ interface WrapperProps {
   borderRadius?: string;
   withBoxShadow?: boolean;
   alignItems?: 'center' | 'auto';
-  justifyContent?: 'center' | 'auto';
+  justifyContent?: 'center' | 'auto' | 'flex-end';
 }
 
 export const Wrapper: FC<WrapperProps> = memo((props) => {

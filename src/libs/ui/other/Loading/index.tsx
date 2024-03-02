@@ -36,7 +36,7 @@ const rotate = keyframes`
   }
 `;
 
-const StyledLoader = styled.div`
+export const StyledLoader = styled.div`
   width: 48px;
   height: 48px;
   border-radius: 50%;

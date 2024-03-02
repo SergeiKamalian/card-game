@@ -1,6 +1,7 @@
 import styled from "styled-components";
 
 export const StyledProfileControl = styled.div`
+    position: relative;
     width: 100%;
     height: 100px;
     background: ${p => p.theme.gradients.form};
@@ -11,8 +12,9 @@ export const StyledProfileControl = styled.div`
     border-top: 1px solid rgba(255,255,255,0.1);
     border-radius: 50px 50px 0 0;
     justify-content: space-between;
-
-    >:first-child {
-        min-width: 190px;
-    }
+`
+export const StyledLogoWrapper = styled.div`
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
 `

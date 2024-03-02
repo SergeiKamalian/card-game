@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { StyledProfileControl } from "./styles";
+import { StyledLogoWrapper, StyledProfileControl } from "./styles";
 import { Logo, UserInfo } from "../../../../ui";
 import { useUserContext } from "../../../../contexts";
 import { ControlActions } from "./components";
@@ -10,7 +10,9 @@ export const ProfileControl = memo(() => {
   return (
     <StyledProfileControl>
       <UserInfo user={user} />
-      <Logo />
+      <StyledLogoWrapper>
+        <Logo />
+      </StyledLogoWrapper>
       <ControlActions />
     </StyledProfileControl>
   );

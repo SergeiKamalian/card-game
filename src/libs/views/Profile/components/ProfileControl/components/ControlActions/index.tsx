@@ -10,7 +10,7 @@ export const ControlActions = memo(() => {
     const theme = useTheme()
 
     return (
-        <Wrapper padding="0" gap={20}>
+        <Wrapper padding="0" gap={20} minWidth="250px" justifyContent="flex-end">
             <Button isCircle circleSize={50}>
                 <FaUserFriends color={theme.colors.white} size={25} />
             </Button>

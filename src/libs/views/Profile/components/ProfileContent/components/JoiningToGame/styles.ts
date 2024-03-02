@@ -7,4 +7,7 @@ export const StyledJoiningToGame = styled.div`
     box-shadow: ${p => p.theme.shadows.primary};
     border-radius: 30px;
     padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 `
