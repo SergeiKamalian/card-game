@@ -1,4 +1,4 @@
 export const GAMERS_TIMES = {
-    ATTACKER: 0.5,
-    DEFENDER: 1
+    ATTACKER: 10000,
+    DEFENDER: 10000
 }

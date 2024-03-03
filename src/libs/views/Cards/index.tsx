@@ -30,7 +30,7 @@ export const Cards = memo((props: CardsProps) => {
 
     const showTakeInTableCardsButton = useMemo(() => game?.defender === user?.name && !game?.defenderSurrendered && (game?.inTableCards as TCard[][]).some(cardGroup => cardGroup.length === 1), [game, user])
 
-    const gamerIsSurrendered = useMemo(() => game?.defender === gamer?.name && game?.defenderSurrendered, [game?.defender, game?.defenderSurrendered, gamer?.name])
+    const gamerIsSurrendered = useMemo(() => game?.defender === gamer?.info.name && game?.defenderSurrendered, [game?.defender, game?.defenderSurrendered, gamer?.info])
 
     const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
 
@@ -70,7 +70,7 @@ export const Cards = memo((props: CardsProps) => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 {remainingSeconds}
                 {gamerIsSurrendered ? <h3 style={{ background: 'red' }}>я беру</h3> : null}
-                <h2>{gamer.name}</h2>
+                <h2>{gamer.info.name}</h2>
                 <div style={{ display: 'flex', gap: 20 }}>
                     {
                         gamer.cards.map(card => (
@@ -95,7 +95,7 @@ export const Cards = memo((props: CardsProps) => {
                     ))
                 }
             </div>
-            <h2>{gamer.name}</h2>
+            <h2>{gamer.info.name}</h2>
             {gamerIsSurrendered ? <h3 style={{ background: 'red' }}>я беру</h3> : null}
 
         </div>

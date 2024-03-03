@@ -11,8 +11,14 @@ export type TGameJoinRequest = {
 }
 export type TTrump = TCard;
 
-export type TGamer = {
+export type TGamerInfo = {
     name: string;
+    level: number;
+    avatarURL: string;
+}
+
+export type TGamer = {
+    info: TGamerInfo;
     cards: TCard[];
     index: number;
     status: GAMER_STATUSES

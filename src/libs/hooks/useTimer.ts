@@ -9,7 +9,7 @@ import { calculateGamerStepTime } from "../utils/timer";
 import { useFirebase } from "./useFirebase";
 
 export const useTimer = () => {
-
+    
     const { user } = useUserContext()
     const { game, suspendAttacker } = useGameContext()
     const { changeData } = useFirebase()
@@ -25,7 +25,7 @@ export const useTimer = () => {
             const attackerFinishTime = new Date(gameTimes.attackerFinishTime);
             const currentTime = new Date();
 
-            // if (currentTime > attackerFinishTime) suspendAttacker()
+            if (currentTime > attackerFinishTime) suspendAttacker()
             if (currentTime > attackerFinishTime) console.log()
         };
         const id = setInterval(checkAttackerFinishTime, 5000);

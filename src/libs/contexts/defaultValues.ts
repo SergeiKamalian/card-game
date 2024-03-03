@@ -22,6 +22,7 @@ export const GAME_CONTEXT_DEFAULT_VALUES = {
     followToGame: () => { },
     game: null as (TGame | null),
     handleSelectCard: (card: TCard) => { },
+    handleUnselectCard: () => {},
     defenderSelectedCard: null as TCard | null,
     closeAttackCardHandler: (inTableCardGroup: TCard[], groupIndex: number) => { },
     finishUserTurnHandler: () => { },

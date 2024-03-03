@@ -23,7 +23,7 @@ export const recognizeAttackerAndDefenderOnStart = (gamers: TGamer[], trump: TRU
             smallerCard: filteredCardsSmallerCard
         }
     })
-    const { name: attacker, index: attackerIndex } = filteredGamers.reduce((gamerWithSmallerCard, currentGamer) => {
+    const { info: attackerInfo, index: attackerIndex } = filteredGamers.reduce((gamerWithSmallerCard, currentGamer) => {
         if (Number(currentGamer['smallerCard']?.value) < Number(gamerWithSmallerCard['smallerCard']?.value)) {
             return currentGamer
         }
@@ -31,10 +31,10 @@ export const recognizeAttackerAndDefenderOnStart = (gamers: TGamer[], trump: TRU
     })
 
     const defenderIndex = attackerIndex + 1 === gamers.length ? 0 : attackerIndex + 1;
-    const defender = gamers.find(({ index }) => index === defenderIndex)?.name || ''
+    const defender = gamers.find(({ index }) => index === defenderIndex)?.info.name || ''
 
     return {
-        attacker,
+        attacker: attackerInfo.name,
         defender
     }
 }

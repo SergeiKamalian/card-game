@@ -34,7 +34,7 @@ export const recognizeAttackerAndDefenderOnFinishLap = (game: TGame) => {
         }
     };
 
-    const prevDefenderIndex = gamers.findIndex(({ name }) => name === game.defender);
+    const prevDefenderIndex = gamers.findIndex(({ info }) => info.name === game.defender);
     const newAttackerIndex = game.defenderSurrendered
         ? (prevDefenderIndex + 1) % gamers.length
         : prevDefenderIndex;
@@ -42,8 +42,8 @@ export const recognizeAttackerAndDefenderOnFinishLap = (game: TGame) => {
     const attackerIndex = findActivePlayerIndex(newAttackerIndex, gamers);
     const defenderIndex = findActivePlayerIndex((attackerIndex + 1) % gamers.length, gamers);
 
-    const attacker = gamers[attackerIndex]?.name;
-    const defender = gamers[defenderIndex]?.name;
+    const attacker = gamers[attackerIndex]?.info.name;
+    const defender = gamers[defenderIndex]?.info.name;
 
     return { attacker, defender };
 };

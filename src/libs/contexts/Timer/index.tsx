@@ -14,7 +14,7 @@ export const useTimerContext = () => {
 
 export const TimerProvider = ({ children }: { children: ReactNode }) => {
     const timerMethods = useTimer();
-
+    console.log(timerMethods)
     return (
         <TimerContext.Provider value={timerMethods}>
             {children}

@@ -11,7 +11,9 @@ const colors = {
     purple1: '#4229a0',
     purple2: '#453a95',
     purple3: '#741788',
-    purpleLight: '#919ab7'
+    purpleLight: '#919ab7',
+    success: '#198754',
+    warning: '#FF5F15'
 }
 const shadows = {
     primary: '2px 13px 75px -14px rgba(0,0,0,1)',

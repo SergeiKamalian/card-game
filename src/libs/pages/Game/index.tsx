@@ -1,41 +1,62 @@
 import { memo, useEffect } from "react";
-import { GameProvider, TimerProvider, useGameContext, useTimerContext } from "../../contexts";
-import { StyledGame } from "./styles";
-import { Cards, Table } from "../../views";
+import {
+  GameProvider,
+  TimerProvider,
+  useGameContext,
+  useTimerContext,
+} from "../../contexts";
+import { StyledGame, StyledGameTopBlock } from "./styles";
+import {
+  GameTable,
+  GamerInterface,
+  RestGamers,
+  RemainingCards,
+  BitoCards
+} from "../../views";
+
 
 const GameComponent = memo(() => {
-    const { followToGame, game, userGamer, restGamers } = useGameContext();
-    const { gameTimes, followTheGameTimes, followTheAttackerTime, followTheDefenderTime } = useTimerContext()
+  const { followToGame, game, userGamer, restGamers } = useGameContext();
+  const {
+    gameTimes,
+    followTheGameTimes,
+    followTheAttackerTime,
+    followTheDefenderTime,
+  } = useTimerContext();
 
-    useEffect(followToGame, [followToGame]);
+  useEffect(followToGame, [followToGame]);
 
-    useEffect(followTheAttackerTime, [followTheAttackerTime]);
+  useEffect(followTheAttackerTime, [followTheAttackerTime]);
 
-    useEffect(followTheDefenderTime, [followTheDefenderTime]);
+  useEffect(followTheDefenderTime, [followTheDefenderTime]);
 
-    useEffect(followTheGameTimes, [followTheGameTimes])
+  useEffect(followTheGameTimes, [followTheGameTimes]);
 
-    if (!userGamer) return null;
+  if (!userGamer || !gameTimes || !game) return null;
 
-    return (
-        <StyledGame>
-            <h1>attacker: {game?.attacker}, max time: {`${gameTimes?.attackerFinishTime}`}</h1>
-            <h1>defender: {game?.defender}, max time: {`${gameTimes?.defenderFinishTime}`}</h1>
-            <div style={{ display: 'flex', gap: 20 }}>
-                {restGamers?.map(gamer => <Cards key={gamer.name} gamer={gamer} />)}
-            </div>
-            <Table />
-            <Cards gamer={userGamer} isUserCards />
-        </StyledGame>
-    )
-})
+  return (
+    <StyledGame>
+      <StyledGameTopBlock>
+        <RemainingCards game={game} />
+        <RestGamers game={game} restGamers={restGamers} gameTimes={gameTimes} />
+        <BitoCards />
+      </StyledGameTopBlock>
+      <GameTable />
+      <GamerInterface
+        game={game}
+        restGamers={restGamers}
+        gameTimes={gameTimes}
+      />
+    </StyledGame>
+  );
+});
 
 export const Game = memo(() => {
-    return (
-        <GameProvider>
-            <TimerProvider>
-                <GameComponent />
-            </TimerProvider>
-        </GameProvider>
-    )
-})
+  return (
+    <GameProvider>
+      <TimerProvider>
+        <GameComponent />
+      </TimerProvider>
+    </GameProvider>
+  );
+});
