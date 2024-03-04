@@ -25,7 +25,7 @@ const StyledLoadingWrapper = styled.div`
   align-items: center;
   left: 0;
   top: 0;
-  z-index: 55;
+  z-index: 999;
 `;
 const rotate = keyframes`
   0% {

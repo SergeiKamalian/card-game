@@ -8,4 +8,5 @@ export const StyledListComponent = styled.div`
   overflow: auto;
   margin-top: 20px;
   width: 100%;
+  padding-bottom: 10px;
 `;

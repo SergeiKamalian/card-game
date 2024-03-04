@@ -84,10 +84,10 @@ export const useAuthorization = () => {
         }
         if (!foundUser) return;
         const sessionToken = generateSessionToken();
-        const token = generateToken(foundUser.name, 1, sessionToken);
+        const token = generateToken(String(foundUser.id), 1, sessionToken);
 
         setCookie(COOKIES_KEYS.ACCESS_TOKEN, token);
-        await changeData(FIREBASE_PATHS.AUTHORIZED_USERS, foundUser.name, {
+        await changeData(FIREBASE_PATHS.AUTHORIZED_USERS, String(foundUser.id), {
           sessionToken,
         });
         changeUser(foundUser);
@@ -139,48 +139,53 @@ export const useAuthorization = () => {
     ]
   );
 
+  const failedToAuthorizeUser = useCallback(() => {
+    destroyCookie(COOKIES_KEYS.ACCESS_TOKEN);
+    navigate(APP_ROUTES.AUTHORIZATION)
+  }, [navigate])
+
   const checkUserAuthStatus = useCallback(async () => {
     try {
       if (userAuthStatus) return;
       const token = getCookie(COOKIES_KEYS.ACCESS_TOKEN);
       if (!token) {
-        console.log("not found");
+        failedToAuthorizeUser();
         return;
       }
-      const [userName, authStatusFinishDateValue, sessionToken] =
+      const [userId, authStatusFinishDateValue, sessionToken] =
         parseToken(token);
 
       const authStatusMaxDate = new Date(authStatusFinishDateValue);
       const currentTime = new Date();
 
       if (currentTime > authStatusMaxDate) {
-        console.log("time is finish");
+        failedToAuthorizeUser()
         return;
       }
 
       const foundAuthorizedUser = await getData<{ sessionToken: string }>(
         FIREBASE_PATHS.AUTHORIZED_USERS,
-        userName
+        userId
       );
       if (sessionToken !== foundAuthorizedUser?.sessionToken) {
-        console.log("tokens is not equal");
+        failedToAuthorizeUser()
         return;
       }
-      const foundedUser = await getUserByUserName(userName);
+      const foundedUser = await getData<TUser>(FIREBASE_PATHS.USERS, userId)
       foundedUser && (await authorizeUser({ currentUser: foundedUser }));
     } catch (error) {
       console.error(error);
     } finally {
       setIsInitLoading(false);
     }
-  }, [authorizeUser, getData, getUserByUserName, setIsInitLoading, userAuthStatus]);
+  }, [authorizeUser, failedToAuthorizeUser, getData, setIsInitLoading, userAuthStatus]);
 
   const logoutUser = useCallback(async () => {
     try {
       if (!user) return;
       setAppLoading(true);
       destroyCookie(COOKIES_KEYS.ACCESS_TOKEN);
-      await deleteData(FIREBASE_PATHS.AUTHORIZED_USERS, user.name);
+      await deleteData(FIREBASE_PATHS.AUTHORIZED_USERS, String(user.id));
       changeUser(null);
       navigate(APP_ROUTES.AUTHORIZATION);
     } catch (error) {

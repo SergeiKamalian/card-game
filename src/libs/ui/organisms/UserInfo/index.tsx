@@ -1,13 +1,14 @@
 import { memo, useState } from "react";
 import { TUser } from "../../../types";
 import {
+  IconWithCircle,
   // IconWithCircle,
   Image,
   Text,
   Wrapper,
 } from "../../atoms";
 import { useTheme } from "styled-components";
-// import { IoSettingsSharp } from "react-icons/io5";
+import { IoSettingsSharp } from "react-icons/io5";
 import { EditPersonalInformation } from "./components";
 
 interface UserInfoProps {
@@ -47,11 +48,11 @@ export const UserInfo = memo((props: UserInfoProps) => {
           </Wrapper>
         </Wrapper>
 
-        {/* <IconWithCircle
+        <IconWithCircle
           icon={<IoSettingsSharp color="white" size={20} />}
           onClick={() => setIsOpen(true)}
           size={40}
-        /> */}
+        />
       </Wrapper>
       <EditPersonalInformation isOpen={isOpen} setIsOpen={setIsOpen} />
     </>
