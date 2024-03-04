@@ -3,5 +3,6 @@ export enum FIREBASE_PATHS {
     AUTHORIZED_USERS = 'authorized-users',
     CARDS = 'cards',
     GAMES = 'games2',
-    GAMES_TIMES = 'games-times'
+    GAMES_TIMES = 'games-times',
+    GLOBAL_CHAT = 'global-chat'
 } 

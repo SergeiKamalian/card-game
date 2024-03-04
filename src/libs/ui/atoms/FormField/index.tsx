@@ -41,7 +41,7 @@ export const FormField = memo((props: FormFieldProps) => {
           </Text>
         )}
       />
-      <StyledRightIcon>{rightIcon}</StyledRightIcon>
+      <StyledRightIcon withLabel={Boolean(label)}>{rightIcon}</StyledRightIcon>
     </StyledFormFieldWrapper>
   );
 });

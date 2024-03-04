@@ -14,7 +14,7 @@ export const StyledButton = styled.button<ButtonProps>`
   background: #14161e;
   padding: 3px;
   cursor: pointer;
-  width: ${p => (p.isCircle && p.circleSize) && `${p.circleSize}px`};
+  min-width: ${p => (p.isCircle && p.circleSize) && `${p.circleSize}px`};
   height: ${p => (p.isCircle && p.circleSize) && `${p.circleSize}px`};
 
   >div {

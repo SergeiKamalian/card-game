@@ -11,6 +11,7 @@ export const StyledFormField = styled.div`
     border-radius: 30px;
     height: 50px;
     padding-left: 20px;
+    padding-right: 20px;
     font-weight: 600;
     background: ${(p) => p.theme.colors.white};
     color: ${(p) => p.theme.colors.secondary};
@@ -35,9 +36,9 @@ export const StyledFormFieldWrapper = styled.div<{ minWidth?: string }>`
   }
 `;
 
-export const StyledRightIcon = styled.div`
+export const StyledRightIcon = styled.div<{withLabel: boolean}>`
   position: absolute;
   
   right: 20px;
-  top: 45px;
+  top: ${p => p.withLabel ? '45px' : '5px'};
 `

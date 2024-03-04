@@ -39,3 +39,9 @@ export const PERSONAL_INFORMATION_SCHEMA = Yup.object().shape({
     .max(30, "maximum_30_charts")
     .required("field_is_required"),
 });
+export const MESSAGE_FORM_SCHEMA = Yup.object().shape({
+  message: Yup.string()
+    .min(1, "minimum_1_charts")
+    .max(30, "maximum_30_charts")
+    .required("field_is_required"),
+});

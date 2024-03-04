@@ -14,3 +14,6 @@ export const PERSONAL_INFORMATION_INITIAL_VALUES = {
     ...REGISTRATION_INITIAL_VALUES,
     avatarURL: ''
 }
+export const MESSAGE_INITIAL_VALUES = {
+    message: ''
+}

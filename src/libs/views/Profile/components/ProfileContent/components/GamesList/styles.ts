@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const StyledGamesList = styled.div`
-  width: 50%;
+  width: 30%;
   height: 100%;
   background: ${(p) => p.theme.gradients.form};
   box-shadow: ${(p) => p.theme.shadows.primary};

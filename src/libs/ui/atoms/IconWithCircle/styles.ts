@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const StyledIconWithCircle = styled.button<{ size: number }>`
-  width: ${(p) => `${p.size}px`};
+  min-width: ${(p) => `${p.size}px`};
   height: ${(p) => `${p.size}px`};
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.2);
