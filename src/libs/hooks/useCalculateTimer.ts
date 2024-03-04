@@ -29,7 +29,10 @@ export const useCalculateTimer = (
       if (remainingPercents < 0) return;
       setPercents(remainingPercents);
     }, 1000);
-    return () => clearInterval(id);
+    return () => {
+      clearInterval(id);
+      setPercents(100);
+    };
   }, [maxTime, positionMaxSeconds]);
   return percents;
 };

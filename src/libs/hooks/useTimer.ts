@@ -46,13 +46,10 @@ export const useTimer = () => {
     }, [game, gameTimes, user?.name])
 
     const followTheGameTimes = useCallback(() => {
-        console.log(game)
-        if (!game) return;
-        console.log('mtav')
+        if (!game) return;        
         const unSub = onSnapshot(doc(database, FIREBASE_PATHS.GAMES_TIMES, String(game.code)), (doc) => {
             const gameTimes = doc.data() as TGameTimes;
-            console.log('ashxatec')
-            console.log(gameTimes)
+
             setGameTimes(gameTimes)
         })
         return () => {

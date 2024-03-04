@@ -13,6 +13,13 @@ export const StyledRemainingCards = styled.div`
     top: 17%;
     right: 30px;
   }
+  >p {
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    left: 25%;
+    transform: translate(-50%, -50%);
+  }
 `;
 export const StyledTrumpWrapper = styled.div`
   height: 190px;

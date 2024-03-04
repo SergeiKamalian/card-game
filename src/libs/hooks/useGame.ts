@@ -16,6 +16,7 @@ import { useFirebase } from "./useFirebase";
 import { useTimer } from "./useTimer";
 import { RootState, selectDefenderCard, unselectDefenderCard } from "../redux";
 import { useDispatch, useSelector } from "react-redux";
+import { notification } from "../ui";
 
 export const useGame = () => {
   const { id } = useParams();
@@ -107,7 +108,7 @@ export const useGame = () => {
           (game?.inTableCards as TCard[][]) || []
         );
         if (!isValidCard) {
-          console.log("card is not valid");
+          notification("Card is not valid", "error");
           return;
         }
         const newGamers = removeCardFromDeck(game, currentGamer, card);
@@ -118,7 +119,7 @@ export const useGame = () => {
         });
         await changeGameTimes({
           attackerMinutes: null,
-          defenderMinutes: 1,
+          defenderMinutes: GAMERS_TIMES.DEFENDER,
           gameId: String(game.code),
         });
       } catch (error) {
@@ -160,11 +161,11 @@ export const useGame = () => {
     async (inTableCardGroup: TCard[], groupIndex: number) => {
       try {
         if (!defenderSelectedCard) {
-          console.log("select card");
+          notification("Select card", "error");
           return;
         }
         if (inTableCardGroup.length !== 1) {
-          console.log("all cards is closed");
+          notification("All cards is closed", "info");
           return;
         }
         if (!game?.trump.trump || !currentGamer) return;
@@ -175,7 +176,7 @@ export const useGame = () => {
           game.trump.trump
         );
         if (!isValidCard) {
-          console.log("card is not valid");
+          notification("Card is not valid", "error");
           return;
         }
         const newGamers = removeCardFromDeck(
@@ -222,7 +223,6 @@ export const useGame = () => {
   const finishTheLap = useCallback(async () => {
     try {
       if (!game) return;
-
       const { attacker: newAttacker, defender: newDefender } =
         recognizeAttackerAndDefenderOnFinishLap(game);
       const { gamers: gameNewGamers, remainingCards: gameRemainingCards } =
@@ -341,7 +341,7 @@ export const useGame = () => {
         inTableCards: "[]",
       };
 
-      console.log(`${game.attacker} is left game!`);
+      notification(`${game.attacker} is left game!`, "info");
 
       await updateGame(updatedGame);
       await changeGameTimes({

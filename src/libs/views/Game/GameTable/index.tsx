@@ -4,10 +4,10 @@ import { StyledGameTable } from "./styles";
 import { TableCards } from "./components";
 
 export const GameTable = memo(() => {
-  const { game, closeAttackCardHandler, defenderSelectedCard } = useGameContext();
+  const { game, closeAttackCardHandler } = useGameContext();
 
   if (!game) return null;
-  console.log(defenderSelectedCard)
+  
   return (
     <StyledGameTable>
       <button onClick={() => closeAttackCardHandler([], 0)}></button>

@@ -4,6 +4,8 @@ export const StyledGamerInterface = styled.div`
     height: 200px;
     width: 100%;
     position: relative;
+    display: flex;
+    justify-content: space-between;
 `
 
 export const StyledGamerInterfaceContent =styled.div`

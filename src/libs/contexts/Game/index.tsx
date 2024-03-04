@@ -6,7 +6,7 @@ const GameContext = createContext(GAME_CONTEXT_DEFAULT_VALUES);
 
 export const useGameContext = () => {
   const context = useContext(GameContext);
-  console.log(context)
+  
   if (!context) {
     throw new Error("useGameContext must be used within a GameContext");
   }

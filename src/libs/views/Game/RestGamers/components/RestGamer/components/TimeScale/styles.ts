@@ -7,6 +7,9 @@ export const StyledTimeScale = styled.div`
   position: absolute;
   top: 0;
   background: rgba(0, 0, 0, 0.7);
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  overflow: hidden;
 `;
 export const StyledHaveTimeScale = styled.div<{ width: number, bg: string }>`
   height: 100%;

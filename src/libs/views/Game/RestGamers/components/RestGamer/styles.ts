@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const StyledRestGamer = styled.div`
+export const StyledRestGamer = styled.div<{disabled: boolean}>`
   width: 140px;
   height: 100%;
   background: rgba(0, 0, 0, 0.4);
@@ -8,7 +8,8 @@ export const StyledRestGamer = styled.div`
   border-radius: 10px;
   box-shadow: 9px 16px 20px -12px black;
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden; */
+  /* opacity: ${p => p.disabled && '0.3'}; */
 `;
 export const StyledNameWrapper = styled.div`
   position: absolute;
@@ -27,4 +28,16 @@ export const StyledLevelWrapper = styled.div`
   bottom: 67px;
   left: 50%;
   transform: translateX(-50%);
+`
+export const StyledDisconnectWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `

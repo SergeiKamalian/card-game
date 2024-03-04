@@ -1,13 +1,22 @@
 import { memo, useMemo } from "react";
 import { TGame, TGameTimes, TGamer } from "../../../../../types";
 import {
+  StyledDisconnectWrapper,
   StyledLevelWrapper,
   StyledNameWrapper,
   StyledRestGamer,
 } from "./styles";
 import { Image, Level, Text } from "../../../../../ui";
-import { RestGamerCards, GamerComments, TimeScale } from "./components";
+import {
+  RestGamerCards,
+  GamerComments,
+  TimeScale,
+  GeneralComment,
+} from "./components";
 import { useCalculateTimer } from "../../../../../hooks";
+import { GAMER_STATUSES } from "../../../../../constants";
+import { VscDebugDisconnect } from "react-icons/vsc";
+import { useTheme } from "styled-components";
 
 interface RestGamerProps {
   restGamer: TGamer;
@@ -18,6 +27,8 @@ interface RestGamerProps {
 
 export const RestGamer = memo((props: RestGamerProps) => {
   const { restGamer, game, gameTimes, isUser = false } = props;
+
+  const theme = useTheme();
 
   const isAttacker = useMemo(
     () => game.attacker === restGamer.info.name,
@@ -48,8 +59,26 @@ export const RestGamer = memo((props: RestGamerProps) => {
 
   const percents = useCalculateTimer(maxTime, position);
 
+  const gamerIsDisabled = useMemo(
+    () => restGamer.status === GAMER_STATUSES.SUSPENDED,
+    [restGamer.status]
+  );
+
+  const gamerIsSurrendered = useMemo(
+    () => game?.defender === restGamer?.info.name && game?.defenderSurrendered,
+    [game?.defender, game?.defenderSurrendered, restGamer?.info.name]
+  );
+
   return (
-    <StyledRestGamer>
+    <StyledRestGamer disabled={gamerIsDisabled}>
+      {gamerIsDisabled ? (
+        <StyledDisconnectWrapper>
+          {<VscDebugDisconnect size={60} color={theme.colors.white} />}
+        </StyledDisconnectWrapper>
+      ) : null}
+      {gamerIsSurrendered ? (
+        <GeneralComment isUser={isUser}>I give up</GeneralComment>
+      ) : null}
       <Image
         alt={restGamer.info.name}
         url={restGamer.info.avatarURL}

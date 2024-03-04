@@ -5,7 +5,7 @@ import {
   StyledRemainingCards,
   StyledRemainingCardsWrapper,
 } from "./styles";
-import { Card, Image } from "../../../ui";
+import { Card, Image, Text } from "../../../ui";
 import cardBack from "../../../assets/images/cardBack.png";
 import { giveRemainingAndBitoCardsCount } from "../../../utils";
 
@@ -27,9 +27,10 @@ export const RemainingCards = memo((props: RemainingCardsProps) => {
     if (remainingCards > 0) return 1;
     return 0;
   }, [remainingCards]);
-
+  
   return (
     <StyledRemainingCards>
+      <Text fz={30} fw={500}>{remainingCards}</Text>
       <Card card={game.trump} withActions={false} />
       <StyledRemainingCardsWrapper>
         {showedCardsCount

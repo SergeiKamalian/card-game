@@ -6,7 +6,7 @@ import {
 import { TGame, TGameTimes, TGamer } from "../../../types";
 import { useUserContext } from "../../../contexts";
 import { RestGamer } from "../RestGamers/components";
-import { GamerInterfaceCards } from "./components";
+import { GamerInterfaceActions, GamerInterfaceCards } from "./components";
 
 interface GamerInterfaceProps {
   restGamers: TGamer[];
@@ -34,6 +34,8 @@ export const GamerInterface = memo((props: GamerInterfaceProps) => {
       <StyledGamerInterfaceContent>
         <GamerInterfaceCards gamer={userGamer} />
       </StyledGamerInterfaceContent>
+
+      <GamerInterfaceActions game={game} />
     </StyledGamerInterface>
   );
 });
