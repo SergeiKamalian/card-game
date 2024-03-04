@@ -12,6 +12,7 @@ export interface TUser extends TUserAdditionalInformation {
     name: string;
     createdAt: string;
     password: string;
+    id: number;
 }
 
 export type TUserRequest = TUser;

@@ -19,23 +19,42 @@ import { useAppLoadingContext, useUserContext } from "../contexts";
 
 import { notification } from "../ui";
 import { useNavigate } from "react-router";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { database } from "../configs";
 
 export const useAuthorization = () => {
-  const { getData, changeData, deleteData } = useFirebase();
+  const { getData, changeData, deleteData, getCollection } = useFirebase();
   const { changeUser, userAuthStatus, user } = useUserContext();
   const { setAppLoading, setIsInitLoading } = useAppLoadingContext();
   const navigate = useNavigate();
 
+  const getUserByUserName = useCallback(async (name: string) => {
+    try {
+      const usersRef = collection(database, FIREBASE_PATHS.USERS);
+      const q = query(usersRef, where("name", "==", name));
+      const snapshot = await getDocs(q);
+      // There can be 1 users with a unique name
+      const users: TUser[] = [];
+      snapshot.forEach((doc) => {
+        const user = doc.data() as TUser;
+        users.push(user);
+      });
+      return users[0];
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
   const checkUserRegistrationStatus = useCallback(
     async (userName: string) => {
       try {
-        const foundUser = await getData<TUser>(FIREBASE_PATHS.USERS, userName);
+        const foundUser = await getUserByUserName(userName);
         return Boolean(foundUser);
       } catch (error) {
         console.error(error);
       }
     },
-    [getData]
+    [getUserByUserName]
   );
 
   const authorizeUser = useCallback(
@@ -50,7 +69,8 @@ export const useAuthorization = () => {
         setAppLoading(true);
         let foundUser = null;
         if (!currentUser && form) {
-          foundUser = await getData<TUser>(FIREBASE_PATHS.USERS, form.name);
+
+          foundUser = await getUserByUserName(form.name)
           if (!foundUser) {
             notification("User not found!", "error");
             return;
@@ -78,7 +98,7 @@ export const useAuthorization = () => {
         setAppLoading(false);
       }
     },
-    [changeData, changeUser, getData, setAppLoading]
+    [changeData, changeUser, getUserByUserName, setAppLoading]
   );
 
   const registerUser = useCallback(
@@ -92,14 +112,16 @@ export const useAuthorization = () => {
           notification("A player with that name exists!", "error");
           return;
         }
-
+        const allUsers = await getCollection<TUser>(FIREBASE_PATHS.USERS);
+        const newUserId = allUsers?.length || 0;
         const createdAt = new Date().toISOString();
         const requestForm: TUserRequest = {
           ...USER_INITIAL_VALUES,
           ...form,
           createdAt: createdAt,
+          id: newUserId,
         };
-        await changeData(FIREBASE_PATHS.USERS, form.name, requestForm);
+        await changeData(FIREBASE_PATHS.USERS, String(newUserId), requestForm);
         await authorizeUser({ form });
         notification("You have successfully registered!", "success");
       } catch (error) {
@@ -108,7 +130,13 @@ export const useAuthorization = () => {
         setAppLoading(false);
       }
     },
-    [authorizeUser, changeData, checkUserRegistrationStatus, setAppLoading]
+    [
+      authorizeUser,
+      changeData,
+      checkUserRegistrationStatus,
+      getCollection,
+      setAppLoading,
+    ]
   );
 
   const checkUserAuthStatus = useCallback(async () => {
@@ -138,14 +166,14 @@ export const useAuthorization = () => {
         console.log("tokens is not equal");
         return;
       }
-      const foundedUser = await getData<TUser>(FIREBASE_PATHS.USERS, userName);
+      const foundedUser = await getUserByUserName(userName);
       foundedUser && (await authorizeUser({ currentUser: foundedUser }));
     } catch (error) {
       console.error(error);
     } finally {
       setIsInitLoading(false);
     }
-  }, [authorizeUser, getData, setIsInitLoading, userAuthStatus]);
+  }, [authorizeUser, getData, getUserByUserName, setIsInitLoading, userAuthStatus]);
 
   const logoutUser = useCallback(async () => {
     try {
@@ -154,7 +182,7 @@ export const useAuthorization = () => {
       destroyCookie(COOKIES_KEYS.ACCESS_TOKEN);
       await deleteData(FIREBASE_PATHS.AUTHORIZED_USERS, user.name);
       changeUser(null);
-      navigate(APP_ROUTES.AUTHORIZATION)
+      navigate(APP_ROUTES.AUTHORIZATION);
     } catch (error) {
     } finally {
       setAppLoading(false);
@@ -165,6 +193,7 @@ export const useAuthorization = () => {
     registerUser,
     authorizeUser,
     checkUserAuthStatus,
-    logoutUser
+    logoutUser,
+    getUserByUserName,
   };
 };
