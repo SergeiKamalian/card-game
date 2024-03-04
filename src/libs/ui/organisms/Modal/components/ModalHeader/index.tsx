@@ -7,7 +7,7 @@ import { useTheme } from "styled-components";
 interface ModalHeaderProps {
   title: string;
   onClose: () => void;
-  action: () => void;
+  action?: () => void;
 }
 
 export const ModalHeader = memo((props: ModalHeaderProps) => {
@@ -23,9 +23,11 @@ export const ModalHeader = memo((props: ModalHeaderProps) => {
           {title}
         </Text>
       </StyledModalHeaderLeftSlide>
-      <Button btnType="submit" onClick={action}>
-        <Text cursor="pointer">Save</Text>
-      </Button>
+      {action ? (
+        <Button btnType="submit" onClick={action}>
+          <Text cursor="pointer">submit</Text>
+        </Button>
+      ) : null}
     </StyledModalHeader>
   );
 });

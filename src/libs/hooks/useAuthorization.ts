@@ -1,12 +1,14 @@
 import { useCallback } from "react";
 import { useFirebase } from "./useFirebase";
 import {
+  APP_ROUTES,
   COOKIES_KEYS,
   FIREBASE_PATHS,
   USER_INITIAL_VALUES,
 } from "../constants";
 import { TUser, TUserForm, TUserRequest } from "../types";
 import {
+  destroyCookie,
   generateSessionToken,
   generateToken,
   getCookie,
@@ -16,11 +18,13 @@ import {
 import { useAppLoadingContext, useUserContext } from "../contexts";
 
 import { notification } from "../ui";
+import { useNavigate } from "react-router";
 
 export const useAuthorization = () => {
-  const { getData, changeData } = useFirebase();
-  const { changeUser, userAuthStatus } = useUserContext();
+  const { getData, changeData, deleteData } = useFirebase();
+  const { changeUser, userAuthStatus, user } = useUserContext();
   const { setAppLoading, setIsInitLoading } = useAppLoadingContext();
+  const navigate = useNavigate();
 
   const checkUserRegistrationStatus = useCallback(
     async (userName: string) => {
@@ -85,7 +89,7 @@ export const useAuthorization = () => {
           form.name
         );
         if (userWithFormNameIsFound) {
-          notification('A player with that name exists!', 'error')
+          notification("A player with that name exists!", "error");
           return;
         }
 
@@ -143,9 +147,24 @@ export const useAuthorization = () => {
     }
   }, [authorizeUser, getData, setIsInitLoading, userAuthStatus]);
 
+  const logoutUser = useCallback(async () => {
+    try {
+      if (!user) return;
+      setAppLoading(true);
+      destroyCookie(COOKIES_KEYS.ACCESS_TOKEN);
+      await deleteData(FIREBASE_PATHS.AUTHORIZED_USERS, user.name);
+      changeUser(null);
+      navigate(APP_ROUTES.AUTHORIZATION)
+    } catch (error) {
+    } finally {
+      setAppLoading(false);
+    }
+  }, [changeUser, deleteData, navigate, setAppLoading, user]);
+
   return {
     registerUser,
     authorizeUser,
     checkUserAuthStatus,
+    logoutUser
   };
 };

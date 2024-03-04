@@ -13,9 +13,12 @@ export const ModalOverlay = styled(motion.div)`
   justify-content: center;
   align-items: center;
 `;
-export const ModalContainer = styled(motion.div)<{ modalWidth: string }>`
+export const ModalContainer = styled(motion.div)<{
+  modalWidth: string;
+  heightFitContent: boolean;
+}>`
   background: ${(p) => p.theme.gradients.form};
-  min-height: 70%;
+  min-height: ${p => !p.heightFitContent && '70%'};
   overflow-y: auto;
   border-radius: 12px;
   width: ${(p) => p.modalWidth};
@@ -24,5 +27,5 @@ export const ModalContainer = styled(motion.div)<{ modalWidth: string }>`
   z-index: 901;
 `;
 export const StyledModalBody = styled.div`
-    padding: 20px;
-`
+  padding: 20px;
+`;

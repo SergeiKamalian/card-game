@@ -11,7 +11,8 @@ interface ModalProps {
   size?: MODAL_SIZES;
   title: string;
   content: ReactNode;
-  action: () => void;
+  action?: () => void;
+  heightFitContent?: boolean;
 }
 
 export const Modal = memo((props: ModalProps) => {
@@ -22,6 +23,7 @@ export const Modal = memo((props: ModalProps) => {
     title,
     content,
     action,
+    heightFitContent = false
   } = props;
   const modalRef = useRef(null);
   useOnClickOutside({ ref: modalRef, handler: onClose });
@@ -44,6 +46,7 @@ export const Modal = memo((props: ModalProps) => {
             ref={modalRef}
             id="modal-container"
             modalWidth={modalWidth}
+            heightFitContent={heightFitContent}
           >
             <ModalHeader action={action} onClose={onClose} title={title} />
             <StyledModalBody>{content}</StyledModalBody>
