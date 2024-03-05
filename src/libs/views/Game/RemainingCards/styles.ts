@@ -51,3 +51,8 @@ export const StyledRemainingCard = styled.div<{ left: number }>`
     border-radius: 10px;
   }
 `;
+
+export const StyledTrumpImage = styled.img`
+  height: 100px;
+  object-fit: contain;
+`

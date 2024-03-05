@@ -10,6 +10,7 @@ import {
 import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FriendsProvider } from "./libs/contexts/Friends";
 
 function App() {
   return (
@@ -18,13 +19,13 @@ function App() {
         <AppProvider>
           <AppLoadingProvider>
             <UserProvider>
-              {/* <TimerProvider> */}
-              <div className="App">
-                <Loading />
-                <Routes />
-              </div>
-              <ToastContainer />
-              {/* </TimerProvider> */}
+              <FriendsProvider>
+                <div className="App">
+                  <Loading />
+                  <Routes />
+                </div>
+                <ToastContainer />
+              </FriendsProvider>
             </UserProvider>
           </AppLoadingProvider>
         </AppProvider>

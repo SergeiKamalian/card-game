@@ -10,6 +10,9 @@ export const GAME_CREATING_INITIAL_VALUES = {
 export const GAME_JOINING_INITIAL_VALUES = {
     code: ''
 }
+export const FRIEND_SEARCH_INITIAL_VALUES = {
+    userName: ''
+}
 export const PERSONAL_INFORMATION_INITIAL_VALUES = {
     ...REGISTRATION_INITIAL_VALUES,
     avatarURL: ''

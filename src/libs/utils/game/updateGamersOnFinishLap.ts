@@ -25,8 +25,6 @@ export const updateGamersOnFinishLap = (game: TGame) => {
         }
 
         const { gamerCards, remainingCards } = getRandomCards(gameRemainingCards, gamer.cards, game.trump);
-        console.log('GAMER CARDS')
-        console.log(gamerCards)
         gameNewGamers.push({ ...gamer, cards: gamerCards });
         gameRemainingCards = remainingCards;
     })

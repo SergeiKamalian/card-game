@@ -29,6 +29,12 @@ export const GAME_JOINING_SCHEMA = Yup.object().shape({
     .required("field_is_required"),
 });
 
+export const FRIEND_SEARCH_SCHEMA = Yup.object().shape({
+  userName: Yup.string()
+    .min(1, "minimum_1_charts")
+    .required("field_is_required"),
+});
+
 export const PERSONAL_INFORMATION_SCHEMA = Yup.object().shape({
   name: Yup.string()
     .min(2, "minimum_2_charts")

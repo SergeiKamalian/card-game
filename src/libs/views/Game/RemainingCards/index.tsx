@@ -4,10 +4,12 @@ import {
   StyledRemainingCard,
   StyledRemainingCards,
   StyledRemainingCardsWrapper,
+  StyledTrumpImage,
 } from "./styles";
 import { Card, Image, Text } from "../../../ui";
 import cardBack from "../../../assets/images/cardBack.png";
 import { giveRemainingAndBitoCardsCount } from "../../../utils";
+import { TRUMPS_IMAGES } from "../../../constants";
 
 interface RemainingCardsProps {
   game: TGame;
@@ -27,20 +29,31 @@ export const RemainingCards = memo((props: RemainingCardsProps) => {
     if (remainingCards > 0) return 1;
     return 0;
   }, [remainingCards]);
-  
+
   return (
     <StyledRemainingCards>
-      <Text fz={30} fw={500}>{remainingCards}</Text>
-      <Card card={game.trump} withActions={false} />
-      <StyledRemainingCardsWrapper>
-        {showedCardsCount
-          ? new Array(showedCardsCount).fill(null).map((_, i) => (
-              <StyledRemainingCard key={i} left={-1.5 * i}>
-                <Image alt="card" height="100%" width="100%" url={cardBack} />
-              </StyledRemainingCard>
-            ))
-          : null}
-      </StyledRemainingCardsWrapper>
+      {showedCardsCount ? (
+        <>
+          <Text fz={30} fw={500}>
+            {remainingCards}
+          </Text>
+          <Card card={game.trump} withActions={false} />
+          <StyledRemainingCardsWrapper>
+            {showedCardsCount
+              ? new Array(showedCardsCount).fill(null).map((_, i) => (
+                  <StyledRemainingCard key={i} left={-1.5 * i}>
+                    <Image
+                      alt="card"
+                      height="100%"
+                      width="100%"
+                      url={cardBack}
+                    />
+                  </StyledRemainingCard>
+                ))
+              : null}
+          </StyledRemainingCardsWrapper>
+        </>
+      ) : <StyledTrumpImage src={TRUMPS_IMAGES[game.trump.trump]} />}
     </StyledRemainingCards>
   );
 });

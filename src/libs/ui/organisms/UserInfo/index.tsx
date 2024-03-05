@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { ReactNode, memo, useState } from "react";
 import { TUser } from "../../../types";
 import {
   IconWithCircle,
@@ -13,10 +13,12 @@ import { EditPersonalInformation } from "./components";
 
 interface UserInfoProps {
   user: TUser;
+  action?: ReactNode;
+  isUserInfo?: boolean;
 }
 
 export const UserInfo = memo((props: UserInfoProps) => {
-  const { user } = props;
+  const { user, isUserInfo = true, action } = props;
   const theme = useTheme();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -40,19 +42,21 @@ export const UserInfo = memo((props: UserInfoProps) => {
           <Text fw={600}>{user.name}</Text>
           <Wrapper padding="0" justifyContent="center" gap={5}>
             <Text fz={14} color={theme.colors.purpleLight}>
-              Level:{" "}
+              Level:
             </Text>
             <Text fz={14} fw={600} color={theme.colors.purpleLight}>
               {user.level}
             </Text>
           </Wrapper>
         </Wrapper>
-
-        <IconWithCircle
-          icon={<IoSettingsSharp color="white" size={20} />}
-          onClick={() => setIsOpen(true)}
-          size={40}
-        />
+        {isUserInfo ? (
+          <IconWithCircle
+            icon={<IoSettingsSharp color="white" size={20} />}
+            onClick={() => setIsOpen(true)}
+            size={40}
+          />
+        ) : null}
+        {action}
       </Wrapper>
       <EditPersonalInformation isOpen={isOpen} setIsOpen={setIsOpen} />
     </>

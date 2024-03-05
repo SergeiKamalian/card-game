@@ -8,3 +8,7 @@ export type TFriendsCount = {
     allCount: number;
     requests: number;
 }
+
+export type TFriendFindRequest = {
+    userName: string;
+}

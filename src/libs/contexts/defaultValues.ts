@@ -1,4 +1,4 @@
-import { TCard, TChangeGameTimes, TGame, TGameTimes, TGamer, TUser } from "../types";
+import { TCard, TChangeGameTimes, TFriendFindRequest, TGame, TGameTimes, TGamer, TUser } from "../types";
 
 export const APP_CONTEXT_DEFAULT_VALUES = {
     initializeApplication: () => { },
@@ -38,4 +38,9 @@ export const TIMER_CONTEXT_DEFAULT_VALUES = {
     changeGameTimes: ({ gameId }: TChangeGameTimes) => { },
     followTheAttackerTime: () => { },
     followTheDefenderTime: () => { }
+}
+export const FRIENDS_CONTEXT_DEFAULT_VALUES = {
+    findFriends: (values: TFriendFindRequest) => {},
+    foundUsers: [] as TUser[],
+    sendFriendRequest: (user: TUser) => {}
 }

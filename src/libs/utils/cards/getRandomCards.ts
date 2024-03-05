@@ -20,6 +20,21 @@ export const getRandomCards = (
     remainingCards.length > necessaryCardsCount
       ? remainingCardsWithoutTrump
       : remainingCards;
+  if (!activeRemainingCards.length)
+    return {
+      gamerCards,
+      remainingCards,
+    };
+  if (activeRemainingCards.length <= necessaryCardsCount) {
+    const gamerNewCards = sortCards(
+      [...gamerCards, ...remainingCards],
+      trumpCard.trump
+    );
+    return {
+      gamerCards: gamerNewCards,
+      remainingCards: [],
+    };
+  }
   const randomizedCards = activeRemainingCards.sort(() => Math.random() - 0.5);
   const gamerNewCards = randomizedCards.slice(0, necessaryCardsCount);
   const gamerReadyCards = sortCards(
