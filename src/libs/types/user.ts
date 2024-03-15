@@ -1,9 +1,9 @@
-import { TFriendsCount } from "./friend";
+import { TFriendsData } from "./friend";
 
 export type TUserAdditionalInformation = {
     level: number;
     coins: number;
-    friendsCount: TFriendsCount;
+    friends: TFriendsData;
     messagesCount: number;
     avatarURL: string;
 }

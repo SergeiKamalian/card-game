@@ -4,9 +4,9 @@ export type TFriend = {
     user: TUser;
 }
 
-export type TFriendsCount = {
-    allCount: number;
-    requests: number;
+export type TFriendsData = {
+    friendsIds: number[];
+    requestsIds: number[];
 }
 
 export type TFriendFindRequest = {

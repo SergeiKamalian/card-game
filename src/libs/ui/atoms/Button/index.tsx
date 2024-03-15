@@ -1,13 +1,6 @@
 import { ButtonHTMLAttributes, FC, ReactNode } from "react";
-import { StyledButton, StyledButtonContent } from "./styles";
-
-// import {
-//   BigBtn,
-//   NormalBtn,
-//   PrimaryBtn,
-//   SecondaryBtn,
-//   SmallBtn,
-// } from './styles';
+import { StyledBadge, StyledButton, StyledButtonContent } from "./styles";
+import { Text } from "../Text";
 
 export interface ButtonProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> {
@@ -18,14 +11,12 @@ export interface ButtonProps
   disabled?: boolean;
   margin?: string;
   padding?: string;
-  // leftIcon?: string | keyof typeof Icons;
-  // rightIcon?: string | keyof typeof Icons;
-  // iconSize?: number;
   btnType?: "submit" | "button" | "reset";
   className?: string;
   children: ReactNode;
   isCircle?: boolean;
   circleSize?: number;
+  badge?: string | number;
 }
 
 export const Button: FC<ButtonProps> = (props) => {
@@ -38,6 +29,7 @@ export const Button: FC<ButtonProps> = (props) => {
     btnType = undefined,
     isCircle,
     circleSize,
+    badge,
     children,
     ...rest
   } = props;
@@ -51,7 +43,14 @@ export const Button: FC<ButtonProps> = (props) => {
       isCircle={isCircle}
       circleSize={circleSize}
     >
-      <StyledButtonContent type={type}>{children}</StyledButtonContent>
+      <StyledButtonContent className="button-content" type={type}>
+        {children}
+      </StyledButtonContent>
+      {badge ? (
+        <StyledBadge>
+          <Text>{badge}</Text>
+        </StyledBadge>
+      ) : null}
     </StyledButton>
   );
 };

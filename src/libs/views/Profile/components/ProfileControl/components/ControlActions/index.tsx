@@ -5,13 +5,19 @@ import { TbMessageCircle2Filled } from "react-icons/tb";
 import { MdCasino } from "react-icons/md";
 import { useTheme } from "styled-components";
 import { useProfileControl } from "../../../../../../hooks";
-import { MODAL_SIZES, PROFILE_CONTROL_ACTIONS } from "../../../../../../constants";
+import {
+  MODAL_SIZES,
+  PROFILE_CONTROL_ACTIONS,
+} from "../../../../../../constants";
 import { FriendsContent } from "./components";
+import { useUserContext } from "../../../../../../contexts";
 
 export const ControlActions = memo(() => {
   const theme = useTheme();
 
   const { setOpenModal, openModal } = useProfileControl();
+
+  const { user } = useUserContext();
 
   const modalContent = useMemo(() => {
     switch (openModal) {
@@ -29,6 +35,7 @@ export const ControlActions = memo(() => {
           isCircle
           circleSize={50}
           onClick={() => setOpenModal(PROFILE_CONTROL_ACTIONS.FRIENDS)}
+          badge={user?.friends.requestsIds.length}
         >
           <FaUserFriends color={theme.colors.white} size={25} />
         </Button>

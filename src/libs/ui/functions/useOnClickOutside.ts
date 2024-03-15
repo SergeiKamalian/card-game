@@ -15,7 +15,10 @@ function checkPreventedElement(clickedElement: HTMLElement, preventCLosedBasedEl
   if (!parentElement) {
     return false;
   }
-  if (parentElement.getAttribute('data-name') === preventCLosedBasedElementDataName) {
+  if (
+    parentElement.getAttribute('data-name') === preventCLosedBasedElementDataName
+    || parentElement.getAttribute('data-name') === 'loading-wrapper'
+  ) {
     return true;
   }
   if (parentElement?.classList[0] === 'Toastify') return true;

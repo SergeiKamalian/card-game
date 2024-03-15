@@ -9,7 +9,7 @@ export const Loading = memo(() => {
   if (!appLoading) return null;
 
   return (
-    <StyledLoadingWrapper>
+    <StyledLoadingWrapper data-name='loading-wrapper'>
       <StyledLoader />
     </StyledLoadingWrapper>
   );

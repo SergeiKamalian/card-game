@@ -16,8 +16,8 @@ export const StyledButton = styled.button<ButtonProps>`
   cursor: pointer;
   min-width: ${p => (p.isCircle && p.circleSize) && `${p.circleSize}px`};
   height: ${p => (p.isCircle && p.circleSize) && `${p.circleSize}px`};
-
-  >div {
+    position: relative;
+  >.button-content {
     padding: ${p => p.isCircle && '0'};
   }
 `;
@@ -37,3 +37,12 @@ export const StyledButtonContent = styled.div<{
   box-shadow: 3px 3px 4px 0px rgb(89 73 146) inset;
   padding: 0 30px;
 `;
+
+export const StyledBadge = styled.div`
+  position: absolute;
+  right: -5px;
+  top: -5px;
+  border-radius: 20px;
+  padding: 2px 12px;
+  background-color: #ff5900;
+`

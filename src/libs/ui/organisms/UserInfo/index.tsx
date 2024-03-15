@@ -38,6 +38,7 @@ export const UserInfo = memo((props: UserInfoProps) => {
           padding="7px 0"
           justifyContent="center"
           gap={0}
+          minWidth="70px"
         >
           <Text fw={600}>{user.name}</Text>
           <Wrapper padding="0" justifyContent="center" gap={5}>
