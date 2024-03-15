@@ -7,7 +7,7 @@ export const getRandomCards = (
   trumpCard: TCard
 ) => {
   const necessaryCardsCount = 6 - gamerCards.length;
-  if (!necessaryCardsCount)
+  if (necessaryCardsCount < 1)
     return {
       gamerCards,
       remainingCards,

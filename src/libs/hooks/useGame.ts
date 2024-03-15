@@ -41,8 +41,12 @@ export const useGame = () => {
   );
 
   const userGamer = useMemo(
-    () => game?.gamers.find((i) => i.info.name === user?.name),
-    [game?.gamers, user?.name]
+    () => {
+      // console.log(game?.gamers)
+      // console.log(user)
+      return game?.gamers.find(({ info }) => info.name === user?.name)
+    },
+    [game?.gamers, user]
   );
 
   const restGamers = useMemo(() => {

@@ -11,9 +11,8 @@ import {
   GamerInterface,
   RestGamers,
   RemainingCards,
-  BitoCards
+  BitoCards,
 } from "../../views";
-
 
 const GameComponent = memo(() => {
   const { followToGame, game, userGamer, restGamers } = useGameContext();
@@ -32,7 +31,12 @@ const GameComponent = memo(() => {
 
   useEffect(followTheGameTimes, [followTheGameTimes]);
 
-  if (!userGamer || !gameTimes || !game) return null;
+  if (!userGamer || !gameTimes || !game) {
+    console.log(userGamer);
+    console.log(gameTimes);
+    console.log(game);
+    return <h1>Че то не так пошло</h1>;
+  }
 
   return (
     <StyledGame>
