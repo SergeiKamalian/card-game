@@ -1,15 +1,18 @@
 import { useCallback, useState } from "react";
 import { useAppLoadingContext, useUserContext } from "../contexts";
-import { TFriendFindRequest, TUser } from "../types";
+import { TFriendFindRequest, TNotification, TUser } from "../types";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { database } from "../configs";
-import { FIREBASE_PATHS } from "../constants";
+import { FIREBASE_PATHS, GAME_REQUEST_TIME } from "../constants";
 import { useFirebase } from "./useFirebase";
 import { notification } from "../ui";
+import { calculateGamerStepTime } from "../utils";
+import { useGameConnection } from "./useGameConnection";
 
 export const useFriends = () => {
   const { setAppLoading } = useAppLoadingContext();
   const { user: currentUser, changeUser } = useUserContext();
+  const { joinToGame } = useGameConnection();
   const [friendsRequests, setFriendsRequests] = useState<TUser[]>([]);
   const [userFriends, setUserFriends] = useState<TUser[]>([]);
 
@@ -21,6 +24,7 @@ export const useFriends = () => {
     async (values: TFriendFindRequest) => {
       try {
         setAppLoading(true);
+        console.log(values.userName);
         const usersRef = collection(database, FIREBASE_PATHS.USERS);
         const q = query(
           usersRef,
@@ -33,19 +37,21 @@ export const useFriends = () => {
           const user = doc.data() as TUser;
           users.push(user);
         });
+        console.log(currentUser);
         const foundedUsers = users.filter(
           (user) =>
             currentUser?.friends.friendsIds.every((i) => i !== user.id) &&
             currentUser?.friends.requestsIds.every((i) => i !== user.id)
         );
-        setFoundUsers(foundedUsers);
+        console.log(foundedUsers);
+        setFoundUsers(users);
       } catch (error) {
         console.error(error);
       } finally {
         setAppLoading(false);
       }
     },
-    [setAppLoading]
+    [currentUser, setAppLoading]
   );
 
   const sendFriendRequest = useCallback(
@@ -201,6 +207,89 @@ export const useFriends = () => {
     }
   }, [currentUser, getData, setAppLoading]);
 
+  const sendGameRequestToFriend = useCallback(
+    async (userId: number, gameId: number) => {
+      if (!currentUser) return;
+      try {
+        setAppLoading(true);
+        const prevData = await getData<TNotification>(
+          FIREBASE_PATHS.USERS_NOTIFICATIONS,
+          String(userId)
+        );
+        const userIsHaveActiveGameRequest = Boolean(prevData?.game);
+        if (userIsHaveActiveGameRequest) {
+          notification("User is have active game request", "error");
+          return;
+        }
+        const createdAt = String(new Date());
+        const finishedAt = String(calculateGamerStepTime(GAME_REQUEST_TIME));
+        const gameData = {
+          code: String(gameId),
+          createdAt,
+          finishedAt,
+          requestUserId: currentUser.id,
+        };
+        const newData = { ...prevData, game: gameData };
+
+        await changeData(
+          FIREBASE_PATHS.USERS_NOTIFICATIONS,
+          String(userId),
+          newData
+        );
+        notification("Game request successfully sended!", "success");
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setAppLoading(false);
+      }
+    },
+    [changeData, currentUser, getData, setAppLoading]
+  );
+
+  const rejectGameRequest = useCallback(async () => {
+    if (!currentUser) return;
+    try {
+      setAppLoading(true);
+      const data = await getData<TNotification>(
+        FIREBASE_PATHS.USERS_NOTIFICATIONS,
+        String(currentUser.id)
+      );
+      if (!data) return;
+
+      await changeData(
+        FIREBASE_PATHS.USERS_NOTIFICATIONS,
+        String(currentUser.id),
+        { ...data, game: null }
+      );
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setAppLoading(false);
+    }
+  }, [changeData, currentUser, getData, setAppLoading]);
+
+  const acceptGameRequest = useCallback(async () => {
+    if (!currentUser) return;
+    try {
+      setAppLoading(true);
+      const data = await getData<TNotification>(
+        FIREBASE_PATHS.USERS_NOTIFICATIONS,
+        String(currentUser.id)
+      );
+      if (!data?.game) return;
+      await changeData(
+        FIREBASE_PATHS.USERS_NOTIFICATIONS,
+        String(currentUser.id),
+        { ...data, game: null }
+      );
+      await joinToGame({ code: data.game.code });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setAppLoading(false);
+    }
+  }, [changeData, currentUser, getData, joinToGame, setAppLoading]);
+
   return {
     foundUsers,
     friendsRequests,
@@ -210,6 +299,9 @@ export const useFriends = () => {
     initFriendsRequests,
     acceptFriendRequest,
     rejectFriendRequest,
-    initUserFriends
+    initUserFriends,
+    sendGameRequestToFriend,
+    rejectGameRequest,
+    acceptGameRequest
   };
 };

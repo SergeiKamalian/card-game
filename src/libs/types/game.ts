@@ -1,5 +1,6 @@
 import { GAMER_STATUSES } from "../constants";
 import { TCard } from "./card";
+import { TUser } from "./user";
 
 export type TGameCreateRequest = {
     gamersCount: number;
@@ -49,4 +50,10 @@ export type TChangeGameTimes = {
     attackerMinutes?: number | null,
     defenderMinutes?: number | null,
     gameId: string
+}
+
+export type TGameRequest = {
+    game: TGame;
+    finishedAt: string;
+    requestUser: TUser;
 }

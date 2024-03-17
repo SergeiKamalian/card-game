@@ -9,6 +9,7 @@ export const StyledGame = styled.div`
     position: absolute;
     padding: 30px 50px;
     max-width: 1510px;
+    overflow: hidden;
 `
 export const StyledGameTopBlock =styled.div`
     width: 100%;

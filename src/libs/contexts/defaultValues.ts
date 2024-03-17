@@ -57,4 +57,7 @@ export const FRIENDS_CONTEXT_DEFAULT_VALUES = {
   userFriends: [] as TUser[],
   acceptFriendRequest: (requestUserId: number) => {},
   rejectFriendRequest: (requestUserId: number) => {},
+  sendGameRequestToFriend: (userId: number, gameId: number) => {},
+  rejectGameRequest: () => {},
+  acceptGameRequest: () => {},
 };

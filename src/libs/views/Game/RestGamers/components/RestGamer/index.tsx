@@ -2,6 +2,7 @@ import { memo, useMemo } from "react";
 import { TGame, TGameTimes, TGamer } from "../../../../../types";
 import {
   StyledDisconnectWrapper,
+  StyledInviteWrapper,
   StyledLevelWrapper,
   StyledNameWrapper,
   StyledRestGamer,
@@ -17,26 +18,36 @@ import { useCalculateTimer } from "../../../../../hooks";
 import { GAMER_STATUSES } from "../../../../../constants";
 import { VscDebugDisconnect } from "react-icons/vsc";
 import { useTheme } from "styled-components";
+import { MdPersonAddAlt } from "react-icons/md";
 
 interface RestGamerProps {
-  restGamer: TGamer;
-  gameTimes: TGameTimes;
+  restGamer: TGamer | null;
+  gameTimes: TGameTimes | null;
   game: TGame;
   isUser?: boolean;
+  isStartingView?: boolean;
+  onInvite?: () => void;
 }
 
 export const RestGamer = memo((props: RestGamerProps) => {
-  const { restGamer, game, gameTimes, isUser = false } = props;
+  const {
+    restGamer,
+    game,
+    gameTimes,
+    isUser = false,
+    isStartingView = false,
+    onInvite,
+  } = props;
 
   const theme = useTheme();
 
   const isAttacker = useMemo(
-    () => game.attacker === restGamer.info.name,
-    [game.attacker, restGamer.info.name]
+    () => game.attacker === restGamer?.info.name,
+    [game.attacker, restGamer?.info.name]
   );
   const isDefender = useMemo(
-    () => game.defender === restGamer.info.name,
-    [game.defender, restGamer.info.name]
+    () => game.defender === restGamer?.info.name,
+    [game.defender, restGamer?.info.name]
   );
 
   const position = useMemo(() => {
@@ -47,21 +58,21 @@ export const RestGamer = memo((props: RestGamerProps) => {
 
   const maxTime = useMemo(() => {
     if (!isAttacker && !isDefender) return null;
-    if (isAttacker) return gameTimes.attackerFinishTime;
-    if (isDefender) return gameTimes.defenderFinishTime;
+    if (isAttacker) return gameTimes?.attackerFinishTime;
+    if (isDefender) return gameTimes?.defenderFinishTime;
     return null;
   }, [
-    gameTimes.attackerFinishTime,
-    gameTimes.defenderFinishTime,
+    gameTimes?.attackerFinishTime,
+    gameTimes?.defenderFinishTime,
     isAttacker,
     isDefender,
   ]);
 
-  const percents = useCalculateTimer(maxTime, position);
+  const percents = useCalculateTimer(maxTime || "", position);
 
   const gamerIsDisabled = useMemo(
-    () => restGamer.status === GAMER_STATUSES.SUSPENDED,
-    [restGamer.status]
+    () => restGamer?.status === GAMER_STATUSES.SUSPENDED,
+    [restGamer?.status]
   );
 
   const gamerIsSurrendered = useMemo(
@@ -70,7 +81,7 @@ export const RestGamer = memo((props: RestGamerProps) => {
   );
 
   return (
-    <StyledRestGamer disabled={gamerIsDisabled}>
+    <StyledRestGamer onClick={onInvite} disabled={gamerIsDisabled} isInvite={!!onInvite}>
       {gamerIsDisabled ? (
         <StyledDisconnectWrapper>
           {<VscDebugDisconnect size={60} color={theme.colors.white} />}
@@ -79,25 +90,36 @@ export const RestGamer = memo((props: RestGamerProps) => {
       {gamerIsSurrendered ? (
         <GeneralComment isUser={isUser}>I give up</GeneralComment>
       ) : null}
-      <Image
-        alt={restGamer.info.name}
-        url={restGamer.info.avatarURL}
-        width="100%"
-        height="70%"
-        borderRadius="10px"
-      />
-      <StyledNameWrapper>
-        <Text>{restGamer.info.name}</Text>
-      </StyledNameWrapper>
-      {!isUser ? (
-        <RestGamerCards cardsCount={restGamer.cards.length} />
-      ) : (
-        <GamerComments position={position} />
+      {!onInvite && (
+        <Image
+          alt={restGamer?.info.name || ""}
+          url={restGamer?.info.avatarURL || ""}
+          width="100%"
+          height="140px"
+          borderRadius="10px"
+        />
       )}
+      <StyledNameWrapper isStartingView={isStartingView}>
+        <Text>{restGamer?.info.name || 'Invite friend'}</Text>
+      </StyledNameWrapper>
+      {!isStartingView ? (
+        !isUser ? (
+          <RestGamerCards cardsCount={restGamer?.cards.length || 1} />
+        ) : (
+          <GamerComments position={position} />
+        )
+      ) : null}
       {maxTime && <TimeScale percents={percents} />}
-      <StyledLevelWrapper>
-        <Level level={restGamer.info.level} />
-      </StyledLevelWrapper>
+      {!onInvite && (
+        <StyledLevelWrapper isStartingView={isStartingView}>
+          <Level level={restGamer?.info.level || 1} />
+        </StyledLevelWrapper>
+      )}
+      {onInvite && (
+        <StyledInviteWrapper className="inviteWrapper">
+          <MdPersonAddAlt size={50} color={theme.colors.purpleLight} />
+        </StyledInviteWrapper>
+      )}
     </StyledRestGamer>
   );
 });

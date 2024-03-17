@@ -12,6 +12,7 @@ import {
   RestGamers,
   RemainingCards,
   BitoCards,
+  Starting,
 } from "../../views";
 
 const GameComponent = memo(() => {
@@ -30,6 +31,10 @@ const GameComponent = memo(() => {
   useEffect(followTheDefenderTime, [followTheDefenderTime]);
 
   useEffect(followTheGameTimes, [followTheGameTimes]);
+
+  if (!game?.started) {
+    return <Starting />
+  }
 
   if (!userGamer || !gameTimes || !game) {
     console.log(userGamer);
