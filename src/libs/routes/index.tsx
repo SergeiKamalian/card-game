@@ -1,11 +1,13 @@
 import { memo, useEffect } from "react";
-import {
-  Route,
-  Routes as AppRoutes,
-} from "react-router-dom";
+import { Route, Routes as AppRoutes } from "react-router-dom";
 import { APP_ROUTES } from "../constants";
 import { AuthorizationRoute, Game, Profile } from "../pages";
-import { InitLoading, useAppLoadingContext, useAuthorization } from "..";
+import {
+  InitLoading,
+  useAppLoadingContext,
+  useAuthorization,
+  useConnection,
+} from "..";
 
 export const Routes = memo(() => {
   const { checkUserAuthStatus } = useAuthorization();
@@ -14,6 +16,8 @@ export const Routes = memo(() => {
   useEffect(() => {
     checkUserAuthStatus();
   }, [checkUserAuthStatus]);
+
+  useConnection();
 
   if (isInitLoading) return <InitLoading />;
 

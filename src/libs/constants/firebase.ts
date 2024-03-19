@@ -6,4 +6,5 @@ export enum FIREBASE_PATHS {
   GAMES_TIMES = "games-times",
   GLOBAL_CHAT = "global-chat",
   USERS_NOTIFICATIONS = "notifications",
+  CONNECTED_USERS = 'online-users'
 }
