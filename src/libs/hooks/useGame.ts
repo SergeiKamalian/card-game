@@ -17,6 +17,7 @@ import { useTimer } from "./useTimer";
 import { RootState, selectDefenderCard, unselectDefenderCard } from "../redux";
 import { useDispatch, useSelector } from "react-redux";
 import { notification } from "../ui";
+import { getDatabase, ref, onValue } from "firebase/database";
 
 export const useGame = () => {
   const { id } = useParams();
@@ -40,14 +41,9 @@ export const useGame = () => {
     [game?.gamers, user?.name]
   );
 
-  const userGamer = useMemo(
-    () => {
-      // console.log(game?.gamers)
-      // console.log(user)
-      return game?.gamers.find(({ info }) => info.name === user?.name)
-    },
-    [game?.gamers, user]
-  );
+  const userGamer = useMemo(() => {
+    return game?.gamers.find(({ info }) => info.name === user?.name);
+  }, [game?.gamers, user]);
 
   const restGamers = useMemo(() => {
     const userIndex = game?.gamers.find(
@@ -82,6 +78,43 @@ export const useGame = () => {
       unSub();
     };
   }, [id]);
+
+  const followGamersStatuses = useCallback(async () => {
+    try {
+      if (!game || !game.started) return;
+      const db = getDatabase();
+      const gameRef = ref(db, `${FIREBASE_PATHS.GAMES}/${game.code}`);
+      onValue(gameRef, async (snapshot) => {
+        const data = snapshot.val() as {
+          gamers: {
+            id: number;
+            name: string;
+            status: GAMER_STATUSES;
+          }[];
+        };
+        const gamersStatuses = data.gamers;
+        const gamers = game.gamers;
+        const updatedGamers: TGamer[] = [];
+        gamers.forEach((gamer) => {
+          const foundStatus = gamersStatuses.find(
+            ({ name }) => gamer.info.name === name
+          );
+          if (!foundStatus) {
+            updatedGamers.push({ ...gamer, status: GAMER_STATUSES.SUSPENDED });
+          } else {
+            updatedGamers.push({ ...gamer, status: foundStatus.status });
+          }
+        });
+        const newGame: TGame = {
+          ...game,
+          gamers: updatedGamers,
+        };
+        await updateGame(newGame);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }, [game]);
 
   const updateGame = useCallback(
     async (data: Partial<TGame>) => {
@@ -370,5 +403,6 @@ export const useGame = () => {
     finishUserTurnHandler,
     takeInTableCards,
     suspendAttacker,
+    followGamersStatuses,
   };
 };

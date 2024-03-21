@@ -10,7 +10,11 @@ export const StyledIconWithCircle = styled.button<{ size: number }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  &:hover {
+  &:hover:not(:disabled) {
     background: rgba(0, 0, 0, 0.4);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: unset;
   }
 `;

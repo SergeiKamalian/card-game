@@ -14,15 +14,19 @@ import {
   BitoCards,
   Starting,
 } from "../../views";
+import { useGameConnection } from "../../hooks/useGameConnection";
 
 const GameComponent = memo(() => {
-  const { followToGame, game, userGamer, restGamers } = useGameContext();
+  const { followToGame, game, userGamer, restGamers, followGamersStatuses } =
+    useGameContext();
   const {
     gameTimes,
     followTheGameTimes,
     followTheAttackerTime,
     followTheDefenderTime,
   } = useTimerContext();
+
+  const { disconnectUserFromGame } = useGameConnection();
 
   useEffect(followToGame, [followToGame]);
 
@@ -32,8 +36,17 @@ const GameComponent = memo(() => {
 
   useEffect(followTheGameTimes, [followTheGameTimes]);
 
+  useEffect(() => {
+    followGamersStatuses()
+  }, [followGamersStatuses]);
+
+  useEffect(() => {
+    if (!game) return;
+    disconnectUserFromGame(game);
+  }, [disconnectUserFromGame, game]);
+
   if (!game?.started) {
-    return <Starting />
+    return <Starting />;
   }
 
   if (!userGamer || !gameTimes || !game) {

@@ -1,4 +1,4 @@
-import { ReactNode, memo, useState } from "react";
+import { ReactNode, memo, useState, useMemo } from "react";
 import { TUser } from "../../../types";
 import {
   IconWithCircle,
@@ -10,6 +10,7 @@ import {
 import { useTheme } from "styled-components";
 import { IoSettingsSharp } from "react-icons/io5";
 import { EditPersonalInformation } from "./components";
+import { useUserConnection } from "../../../hooks";
 
 interface UserInfoProps {
   user: TUser;
@@ -19,12 +20,19 @@ interface UserInfoProps {
 
 export const UserInfo = memo((props: UserInfoProps) => {
   const { user, isUserInfo = true, action } = props;
-  const theme = useTheme();
+  const { colors } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
+
+  const isConnected = useUserConnection(user.id);
 
   return (
     <>
-      <Wrapper gap={15} alignItems="center" minWidth="250px">
+      <Wrapper
+        gap={15}
+        alignItems="center"
+        minWidth="250px"
+        position="relative"
+      >
         <Image
           alt={user.name}
           url={user.avatarURL}
@@ -42,13 +50,22 @@ export const UserInfo = memo((props: UserInfoProps) => {
         >
           <Text fw={600}>{user.name}</Text>
           <Wrapper padding="0" justifyContent="center" gap={5}>
-            <Text fz={14} color={theme.colors.purpleLight}>
+            <Text fz={14} color={colors.purpleLight}>
               Level:
             </Text>
-            <Text fz={14} fw={600} color={theme.colors.purpleLight}>
+            <Text fz={14} fw={600} color={colors.purpleLight}>
               {user.level}
             </Text>
           </Wrapper>
+          {!isUserInfo ? (
+            <Text
+              color={isConnected ? colors.success : colors.error}
+              fz={12}
+              fw={500}
+            >
+              {isConnected ? "Online" : "Offline"}
+            </Text>
+          ) : null}
         </Wrapper>
         {isUserInfo ? (
           <IconWithCircle

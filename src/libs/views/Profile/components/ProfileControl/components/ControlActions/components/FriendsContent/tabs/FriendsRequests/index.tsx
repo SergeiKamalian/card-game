@@ -4,7 +4,6 @@ import { useMount } from "react-use";
 import {
   IconWithCircle,
   UserInfo,
-  Wrapper,
 } from "../../../../../../../../../../ui";
 import { StyledWrapper } from "./styles";
 import { MdDone } from "react-icons/md";

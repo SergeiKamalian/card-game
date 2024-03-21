@@ -55,6 +55,7 @@ export const StyledDisconnectWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius: 10px;
 `;
 export const StyledInviteWrapper = styled.div`
   height: 149px;

@@ -14,6 +14,7 @@ interface WrapperProps {
   withBoxShadow?: boolean;
   alignItems?: 'center' | 'auto';
   justifyContent?: 'center' | 'auto' | 'flex-end' | 'space-between';
+  position?: 'relative' | 'absolute' | 'unset'
 }
 
 export const Wrapper: FC<WrapperProps> = memo((props) => {
@@ -28,7 +29,8 @@ export const Wrapper: FC<WrapperProps> = memo((props) => {
     borderRadius,
     withBoxShadow = false,
     alignItems = 'auto',
-    justifyContent = 'auto'
+    justifyContent = 'auto',
+    position = 'unset'
   } = props;
 
   return (
@@ -43,6 +45,7 @@ export const Wrapper: FC<WrapperProps> = memo((props) => {
       $withBoxShadow={withBoxShadow}
       $alignItems={alignItems}
       $justifyContent={justifyContent}
+      $position={position}
     >
       {children}
     </StyledWrapper>

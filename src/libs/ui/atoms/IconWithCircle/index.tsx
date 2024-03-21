@@ -5,12 +5,19 @@ interface IconWithCircleProps {
   icon: ReactNode;
   onClick: () => void;
   size?: number;
+  isDisabled?: boolean;
 }
 
 export const IconWithCircle = memo((props: IconWithCircleProps) => {
-  const { icon, onClick, size = 30 } = props;
+  const { icon, onClick, size = 30, isDisabled = false } = props;
+
   return (
-    <StyledIconWithCircle size={size} onClick={onClick}>
+    <StyledIconWithCircle
+      disabled={isDisabled}
+      className="icon-with-circle"
+      size={size}
+      onClick={onClick}
+    >
       {icon}
     </StyledIconWithCircle>
   );

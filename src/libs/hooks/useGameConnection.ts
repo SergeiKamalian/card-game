@@ -12,7 +12,7 @@ import {
   randomizeTrump,
   recognizeAttackerAndDefenderOnStart,
 } from "../utils";
-import { useAppContext, useTimerContext, useUserContext } from "../contexts";
+import { useAppContext, useUserContext } from "../contexts";
 import { useFirebase } from "./useFirebase";
 import {
   APP_ROUTES,
@@ -22,6 +22,7 @@ import {
 } from "../constants";
 import { useNavigate } from "react-router";
 import { useTimer } from "./useTimer";
+import { get, getDatabase, onDisconnect, ref, set } from "firebase/database";
 
 export const useGameConnection = () => {
   const { user } = useUserContext();
@@ -29,6 +30,61 @@ export const useGameConnection = () => {
   const { changeData, getData } = useFirebase();
   const navigate = useNavigate();
   const { changeGameTimes } = useTimer();
+
+  const connectUserToGamer = useCallback(
+    async (gameCode: string) => {
+      if (!user) return;
+      try {
+        const db = getDatabase();
+        const gamesRef = ref(db, `${FIREBASE_PATHS.GAMES}/${gameCode}`);
+        let data: null | {
+          gamers: { id: number; name: string; status: GAMER_STATUSES }[];
+        } = null;
+        const snapshot = await get(gamesRef);
+        if (snapshot.exists()) {
+          data = snapshot.val();
+        }
+        const userData = {
+          id: user.id,
+          name: user.name,
+          status: GAMER_STATUSES.ACTIVE,
+        };
+        set(gamesRef, {
+          gamers: !data ? [userData] : [...data.gamers, userData],
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [user]
+  );
+
+  const disconnectUserFromGame = useCallback(
+    async (game: TGame) => {
+      if (!user) return;
+      try {
+        const db = getDatabase();
+        const gamesRef = ref(db, `${FIREBASE_PATHS.GAMES}/${game.code}`);
+        let data: null | {
+          gamers: { id: number; name: string; status: GAMER_STATUSES }[];
+        } = null;
+        const snapshot = await get(gamesRef);
+        if (snapshot.exists()) {
+          data = snapshot.val();
+        }
+        const disconnectRef = onDisconnect(gamesRef);
+        const newData = data?.gamers.filter(({ id }) => id !== user.id) || [];
+        if (!newData.length) {
+          disconnectRef.remove();
+          return;
+        }
+        disconnectRef.set({ gamers: newData });
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [user]
+  );
 
   const createGame = useCallback(
     async (creatingForm: TGameCreateRequest) => {
@@ -79,12 +135,13 @@ export const useGameConnection = () => {
           String(requestData.code),
           requestData
         );
+        await connectUserToGamer(String(gameCode));
         navigate(`${APP_ROUTES.GAME}/${requestData.code}`);
       } catch (error) {
         console.error(error);
       }
     },
-    [user, cards, changeData, navigate]
+    [user, cards, changeData, connectUserToGamer, navigate]
   );
 
   const joinToGame = useCallback(
@@ -122,16 +179,15 @@ export const useGameConnection = () => {
           {
             cards: gamerCards,
             info: {
-                name: user.name,
-                avatarURL: user.avatarURL,
-                level: user.level
+              name: user.name,
+              avatarURL: user.avatarURL,
+              level: user.level,
             },
             index: foundGame.gamers.length,
             status: GAMER_STATUSES.ACTIVE,
           },
         ];
         const started = updatedGamers.length === Number(foundGame.gamersCount);
-
 
         const { attacker, defender } = recognizeAttackerAndDefenderOnStart(
           updatedGamers,
@@ -151,22 +207,24 @@ export const useGameConnection = () => {
           requestData
         );
         if (started) {
-          console.log("join");
           changeGameTimes({
             attackerMinutes: GAMERS_TIMES.ATTACKER,
             gameId: joiningForm.code,
           });
         }
+        await connectUserToGamer(String(requestData.code));
         navigate(`${APP_ROUTES.GAME}/${requestData.code}`);
       } catch (error) {
         console.error(error);
       }
     },
-    [changeData, changeGameTimes, getData, navigate, user]
+    [changeData, changeGameTimes, connectUserToGamer, getData, navigate, user]
   );
 
   return {
     createGame,
     joinToGame,
+    disconnectUserFromGame,
+    connectUserToGamer,
   };
 };

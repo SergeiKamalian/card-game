@@ -11,6 +11,7 @@ interface WrapperProps {
     $withBoxShadow: boolean;
     $alignItems: string;
     $justifyContent: string;
+    $position: string;
 }
 
 export const StyledWrapper = styled.div<WrapperProps>`
@@ -18,7 +19,7 @@ export const StyledWrapper = styled.div<WrapperProps>`
   border-radius: ${p => p.$borderRadius || 'none'};
   box-shadow: ${p => p.$withBoxShadow && p.theme.shadows.primary};
   padding: ${p => p.$padding};
-
+  position: ${p => p.$position};
   display: flex;
   flex-direction: ${p => p.$direction};
   gap: ${p => p.$gap && `${p.$gap}px`};
