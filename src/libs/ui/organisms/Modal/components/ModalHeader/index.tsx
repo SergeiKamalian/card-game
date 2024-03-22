@@ -6,7 +6,7 @@ import { useTheme } from "styled-components";
 
 interface ModalHeaderProps {
   title: string;
-  onClose: () => void;
+  onClose?: () => void;
   action?: () => void;
 }
 
@@ -14,15 +14,21 @@ export const ModalHeader = memo((props: ModalHeaderProps) => {
   const { onClose, title, action } = props;
   const theme = useTheme();
   return (
-    <StyledModalHeader>
-      <StyledModalHeaderLeftSlide>
-        <button onClick={onClose}>
-          <IoMdClose color={theme.colors.white} size={30} />
-        </button>
-        <Text fz={22} fw={500} color={theme.colors.white}>
+    <StyledModalHeader isCenterContent={!onClose}>
+      {onClose ? (
+        <StyledModalHeaderLeftSlide>
+          <button onClick={onClose}>
+            <IoMdClose color={theme.colors.white} size={30} />
+          </button>
+          <Text fz={22} fw={500} color={theme.colors.white}>
+            {title}
+          </Text>
+        </StyledModalHeaderLeftSlide>
+      ) : (
+        <Text fz={30} fw={500} color={theme.colors.white}>
           {title}
         </Text>
-      </StyledModalHeaderLeftSlide>
+      )}
       {action ? (
         <Button btnType="submit" onClick={action}>
           <Text cursor="pointer">submit</Text>

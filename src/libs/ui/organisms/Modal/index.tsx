@@ -7,7 +7,7 @@ import { ModalHeader } from "./components";
 
 interface ModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   size?: MODAL_SIZES;
   title: string;
   content: ReactNode;

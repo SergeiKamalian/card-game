@@ -38,7 +38,8 @@ export const GAME_CONTEXT_DEFAULT_VALUES = {
   userGamer: {} as TGamer | undefined,
   restGamers: [] as TGamer[],
   suspendAttacker: () => {},
-  followGamersStatuses: () => {}
+  followGamersStatuses: () => {},
+  gameIsFinished: false,
 };
 
 export const TIMER_CONTEXT_DEFAULT_VALUES = {

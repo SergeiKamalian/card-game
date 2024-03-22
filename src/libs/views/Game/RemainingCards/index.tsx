@@ -31,7 +31,7 @@ export const RemainingCards = memo((props: RemainingCardsProps) => {
   }, [remainingCards]);
 
   return (
-    <StyledRemainingCards>
+    <StyledRemainingCards isCenter={!showedCardsCount}>
       {showedCardsCount ? (
         <>
           <Text fz={30} fw={500}>

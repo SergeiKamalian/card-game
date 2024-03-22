@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router";
-import { TCard, TGame, TGamer } from "../types";
+import { TCard, TGame, TGamer, TGamerStatus } from "../types";
 import { doc, onSnapshot } from "firebase/firestore";
 import { database } from "../configs";
 import { FIREBASE_PATHS, GAMERS_TIMES, GAMER_STATUSES } from "../constants";
@@ -17,7 +17,7 @@ import { useTimer } from "./useTimer";
 import { RootState, selectDefenderCard, unselectDefenderCard } from "../redux";
 import { useDispatch, useSelector } from "react-redux";
 import { notification } from "../ui";
-import { getDatabase, ref, onValue } from "firebase/database";
+import { getDatabase, ref, onValue, get, set } from "firebase/database";
 
 export const useGame = () => {
   const { id } = useParams();
@@ -32,9 +32,17 @@ export const useGame = () => {
 
   const { changeGameTimes } = useTimer();
 
-  const { changeData } = useFirebase();
+  const { changeData, getData } = useFirebase();
 
   const [game, setGame] = useState<TGame | null>(null);
+
+  const [gameIsFinished, setGameIsFinished] = useState(false);
+
+  const gameRef = useMemo(() => {
+    if (!game) return null;
+    const db = getDatabase();
+    return ref(db, `${FIREBASE_PATHS.GAMES}/${game.code}`);
+  }, [game]);
 
   const currentGamer = useMemo(
     () => game?.gamers.find(({ info }) => info.name === user?.name),
@@ -79,43 +87,6 @@ export const useGame = () => {
     };
   }, [id]);
 
-  const followGamersStatuses = useCallback(async () => {
-    try {
-      if (!game || !game.started) return;
-      const db = getDatabase();
-      const gameRef = ref(db, `${FIREBASE_PATHS.GAMES}/${game.code}`);
-      onValue(gameRef, async (snapshot) => {
-        const data = snapshot.val() as {
-          gamers: {
-            id: number;
-            name: string;
-            status: GAMER_STATUSES;
-          }[];
-        };
-        const gamersStatuses = data.gamers;
-        const gamers = game.gamers;
-        const updatedGamers: TGamer[] = [];
-        gamers.forEach((gamer) => {
-          const foundStatus = gamersStatuses.find(
-            ({ name }) => gamer.info.name === name
-          );
-          if (!foundStatus) {
-            updatedGamers.push({ ...gamer, status: GAMER_STATUSES.SUSPENDED });
-          } else {
-            updatedGamers.push({ ...gamer, status: foundStatus.status });
-          }
-        });
-        const newGame: TGame = {
-          ...game,
-          gamers: updatedGamers,
-        };
-        await updateGame(newGame);
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }, [game]);
-
   const updateGame = useCallback(
     async (data: Partial<TGame>) => {
       try {
@@ -136,6 +107,80 @@ export const useGame = () => {
     [changeData, game]
   );
 
+  const followGamersStatuses = useCallback(async () => {
+    try {
+      if (!game || !game.started || !gameRef) return;
+      onValue(gameRef, async (gameStatusesSnapshot) => {
+        const gameStatusesData = gameStatusesSnapshot.val();
+        const gamersStatuses = gameStatusesData.gamers as TGamerStatus[];
+        const updatedGame = await getData<TGame>(
+          FIREBASE_PATHS.GAMES,
+          String(game.code)
+        );
+        if (!updatedGame) return;
+        const { gamers, finishedGamersPlaces } = updatedGame;
+        const updatedFinishedGamersPlaces = [...finishedGamersPlaces];
+        const updatedGamers = gamers.map((gamer) => {
+          const gamerStatus = gamersStatuses.find(({ id }) => id === gamer.id);
+          if (!gamerStatus) return gamer;
+          if (gamerStatus.status === gamer.status) return gamer;
+          if (gamerStatus.status === GAMER_STATUSES.FINISH) {
+            const place = updatedFinishedGamersPlaces.length + 1;
+            updatedFinishedGamersPlaces.push({ gamer, place: place });
+          }
+          return {
+            ...gamer,
+            status: gamerStatus.status,
+          };
+        });
+        await updateGame({
+          gamers: updatedGamers,
+          finishedGamersPlaces: updatedFinishedGamersPlaces,
+        });
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }, [game, gameRef, getData, updateGame]);
+
+  const checkGamerFinishStatus = useCallback(
+    async (game: TGame, gamerName: string) => {
+      try {
+        const currentGamer = game.gamers.find(
+          ({ info }) => info.name === gamerName
+        );
+        if (!currentGamer || !user) return;
+        const gameIsFinished =
+          !game.remainingCards.length && !currentGamer.cards.length;
+        if (!gameIsFinished || !gameRef) return;
+        let gamersStatusesData: { gamers: TGamerStatus[] } | null = null;
+        const snapshot = await get(gameRef);
+        if (snapshot.exists()) {
+          gamersStatusesData = snapshot.val();
+        }
+        if (!gamersStatusesData) return;
+        const gamerNewStatusData = {
+          id: user.id,
+          name: user.name,
+          status: GAMER_STATUSES.FINISH,
+        };
+        const updatedGamersStatusesData = gamersStatusesData.gamers.map(
+          (gamer) => {
+            if (gamer.name === gamerNewStatusData.name)
+              return gamerNewStatusData;
+            return gamer;
+          }
+        );
+        set(gameRef, {
+          gamers: updatedGamersStatusesData,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [gameRef, user]
+  );
+
   const attackHandler = useCallback(
     async (card: TCard) => {
       try {
@@ -150,20 +195,26 @@ export const useGame = () => {
         }
         const newGamers = removeCardFromDeck(game, currentGamer, card);
         const newInTableCards = [...(game.inTableCards as TCard[][]), [card]];
-        await updateGame({
+
+        if (!newGamers) return;
+        const newGame: TGame = {
+          ...game,
           inTableCards: JSON.stringify(newInTableCards),
           gamers: newGamers,
-        });
+        };
+        await updateGame(newGame);
         await changeGameTimes({
           attackerMinutes: null,
           defenderMinutes: GAMERS_TIMES.DEFENDER,
           gameId: String(game.code),
         });
+
+        await checkGamerFinishStatus(newGame, currentGamer.info.name);
       } catch (error) {
         console.error(error);
       }
     },
-    [changeGameTimes, currentGamer, game, updateGame]
+    [changeGameTimes, checkGamerFinishStatus, currentGamer, game, updateGame]
   );
 
   const handleSelectCard = useCallback(
@@ -250,11 +301,23 @@ export const useGame = () => {
           defenderMinutes: defenderNewMinutes,
           gameId: String(game.code),
         });
+        const updatedGame: TGame = {
+          ...game,
+          ...newGame,
+        };
+        await checkGamerFinishStatus(updatedGame, currentGamer.info.name);
       } catch (error) {
         console.error(error);
       }
     },
-    [changeGameTimes, currentGamer, defenderSelectedCard, game, updateGame]
+    [
+      changeGameTimes,
+      checkGamerFinishStatus,
+      currentGamer,
+      defenderSelectedCard,
+      game,
+      updateGame,
+    ]
   );
 
   const finishTheLap = useCallback(async () => {
@@ -396,6 +459,7 @@ export const useGame = () => {
     defenderSelectedCard,
     userGamer,
     restGamers,
+    gameIsFinished,
     followToGame,
     handleSelectCard,
     handleUnselectCard,

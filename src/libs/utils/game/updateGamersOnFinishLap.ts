@@ -8,11 +8,6 @@ export const updateGamersOnFinishLap = (game: TGame) => {
   let gameRemainingCards = game.remainingCards;
 
   game.gamers.forEach((gamer) => {
-    if (!gameRemainingCards.length) {
-      gameNewGamers.push(gamer);
-      return;
-    }
-
     const isSurrenderedDefender =
       game.defenderSurrendered && game.defender === gamer.info.name;
     if (isSurrenderedDefender) {
@@ -34,6 +29,13 @@ export const updateGamersOnFinishLap = (game: TGame) => {
       return;
     }
 
+    if (!gameRemainingCards.length) {
+      gameNewGamers.push(gamer);
+      return;
+    }
+    console.log('hasela mijev stex')
+    console.log(gamer.cards)
+    console.log(gameRemainingCards)
     const { gamerCards, remainingCards } = getRandomCards(
       gameRemainingCards,
       gamer.cards,

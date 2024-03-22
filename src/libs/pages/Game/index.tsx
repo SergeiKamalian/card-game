@@ -15,10 +15,17 @@ import {
   Starting,
 } from "../../views";
 import { useGameConnection } from "../../hooks/useGameConnection";
+import { Modal } from "../../ui";
 
 const GameComponent = memo(() => {
-  const { followToGame, game, userGamer, restGamers, followGamersStatuses } =
-    useGameContext();
+  const {
+    followToGame,
+    game,
+    userGamer,
+    restGamers,
+    gameIsFinished,
+    followGamersStatuses,
+  } = useGameContext();
   const {
     gameTimes,
     followTheGameTimes,
@@ -37,7 +44,7 @@ const GameComponent = memo(() => {
   useEffect(followTheGameTimes, [followTheGameTimes]);
 
   useEffect(() => {
-    followGamersStatuses()
+    followGamersStatuses();
   }, [followGamersStatuses]);
 
   useEffect(() => {
@@ -50,26 +57,34 @@ const GameComponent = memo(() => {
   }
 
   if (!userGamer || !gameTimes || !game) {
-    console.log(userGamer);
-    console.log(gameTimes);
-    console.log(game);
-    return <h1>Че то не так пошло</h1>;
+    return null;
   }
 
   return (
-    <StyledGame>
-      <StyledGameTopBlock>
-        <RemainingCards game={game} />
-        <RestGamers game={game} restGamers={restGamers} gameTimes={gameTimes} />
-        <BitoCards />
-      </StyledGameTopBlock>
-      <GameTable />
-      <GamerInterface
-        game={game}
-        restGamers={restGamers}
-        gameTimes={gameTimes}
+    <>
+      <StyledGame>
+        <StyledGameTopBlock>
+          <RemainingCards game={game} />
+          <RestGamers
+            game={game}
+            restGamers={restGamers}
+            gameTimes={gameTimes}
+          />
+          <BitoCards game={game} />
+        </StyledGameTopBlock>
+        <GameTable />
+        <GamerInterface
+          game={game}
+          restGamers={restGamers}
+          gameTimes={gameTimes}
+        />
+      </StyledGame>
+      <Modal
+        isOpen={gameIsFinished}
+        content={<span>finished</span>}
+        title="Game is finished!"
       />
-    </StyledGame>
+    </>
   );
 });
 

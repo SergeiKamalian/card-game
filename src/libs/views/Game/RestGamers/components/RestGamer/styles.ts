@@ -68,3 +68,7 @@ export const StyledInviteWrapper = styled.div`
     transition: all 0.2s;
   }
 `;
+export const StyledWinnerWrapper = styled.div`
+  position: absolute;
+  z-index: 4;
+`

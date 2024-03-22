@@ -73,11 +73,16 @@ export const useGameConnection = () => {
           data = snapshot.val();
         }
         const disconnectRef = onDisconnect(gamesRef);
-        const newData = data?.gamers.filter(({ id }) => id !== user.id) || [];
-        if (!newData.length) {
-          disconnectRef.remove();
-          return;
-        }
+        const newData = data?.gamers.map((item) => {
+          if (item.id === user.id)
+            return {
+              ...item,
+              status: GAMER_STATUSES.SUSPENDED,
+            };
+
+          return item;
+        });
+        if (!newData) return;
         disconnectRef.set({ gamers: newData });
       } catch (error) {
         console.error(error);
@@ -91,10 +96,12 @@ export const useGameConnection = () => {
       try {
         if (!user || !cards) return;
 
+        const testCards = cards.slice(0, 15);
+
         const gameCode = generateGameCode();
-        const { trump: trumpCard } = randomizeTrump(cards);
+        const { trump: trumpCard } = randomizeTrump(testCards);
         const { gamerCards, remainingCards } = getRandomCards(
-          cards,
+          testCards,
           [],
           trumpCard
         );
@@ -111,6 +118,7 @@ export const useGameConnection = () => {
             info: gamerInfo,
             index: 0,
             status: GAMER_STATUSES.ACTIVE,
+            id: user.id,
           },
         ];
 
@@ -128,6 +136,7 @@ export const useGameConnection = () => {
           alreadyPlayedAttackersCount: 0,
           defenderSurrendered: false,
           gamersCount: Number(creatingForm.gamersCount),
+          finishedGamersPlaces: [],
         };
 
         await changeData(
@@ -185,6 +194,7 @@ export const useGameConnection = () => {
             },
             index: foundGame.gamers.length,
             status: GAMER_STATUSES.ACTIVE,
+            id: user.id,
           },
         ];
         const started = updatedGamers.length === Number(foundGame.gamersCount);

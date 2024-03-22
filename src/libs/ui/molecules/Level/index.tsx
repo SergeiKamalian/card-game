@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { StyledLevel, StyledLevelImage, StyledLevelWrapper } from "./styles";
 import levelImage from "../../../assets/images/level.png";
-import { Image, Text } from "../../atoms";
+import { Text } from "../../atoms";
 
 interface LevelProps {
   level: number;

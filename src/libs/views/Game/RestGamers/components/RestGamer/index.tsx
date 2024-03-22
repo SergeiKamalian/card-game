@@ -6,8 +6,9 @@ import {
   StyledLevelWrapper,
   StyledNameWrapper,
   StyledRestGamer,
+  StyledWinnerWrapper,
 } from "./styles";
-import { Image, Level, Text } from "../../../../../ui";
+import { Image, Level, Text, Winner } from "../../../../../ui";
 import {
   RestGamerCards,
   GamerComments,
@@ -75,13 +76,29 @@ export const RestGamer = memo((props: RestGamerProps) => {
     [restGamer?.status]
   );
 
+  const gamerIsFinished = useMemo(
+    () => restGamer?.status === GAMER_STATUSES.FINISH,
+    [restGamer?.status]
+  );
+
   const gamerIsSurrendered = useMemo(
     () => game?.defender === restGamer?.info.name && game?.defenderSurrendered,
     [game?.defender, game?.defenderSurrendered, restGamer?.info.name]
   );
 
   return (
-    <StyledRestGamer onClick={onInvite} disabled={gamerIsDisabled} isInvite={!!onInvite}>
+    <StyledRestGamer
+      onClick={onInvite}
+      disabled={gamerIsDisabled}
+      isInvite={!!onInvite}
+    >
+      {gamerIsFinished ? (
+        <StyledDisconnectWrapper>
+          <StyledWinnerWrapper>
+            <Winner winnerPosition={1} />
+          </StyledWinnerWrapper>
+        </StyledDisconnectWrapper>
+      ) : null}
       {gamerIsDisabled ? (
         <StyledDisconnectWrapper>
           {<VscDebugDisconnect size={60} color={theme.colors.white} />}
@@ -100,7 +117,7 @@ export const RestGamer = memo((props: RestGamerProps) => {
         />
       )}
       <StyledNameWrapper isStartingView={isStartingView}>
-        <Text>{restGamer?.info.name || 'Invite friend'}</Text>
+        <Text>{restGamer?.info.name || "Invite friend"}</Text>
       </StyledNameWrapper>
       {!isStartingView ? (
         !isUser ? (

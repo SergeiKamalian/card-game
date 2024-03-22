@@ -1,10 +1,13 @@
 import styled from "styled-components";
 
-export const StyledRemainingCards = styled.div`
+export const StyledRemainingCards = styled.div<{ isCenter: boolean }>`
   position: relative;
   min-width: 250px;
   height: 100%;
   zoom: 0.8;
+  display: flex;
+  align-items: ${p => p.isCenter && 'center'};
+  justify-content: ${p => p.isCenter && 'center'};
 
   > button {
     height: 190px;
@@ -13,7 +16,7 @@ export const StyledRemainingCards = styled.div`
     top: 17%;
     right: 30px;
   }
-  >p {
+  > p {
     position: absolute;
     z-index: 3;
     top: 50%;
@@ -45,9 +48,9 @@ export const StyledRemainingCardsWrapper = styled.div`
 export const StyledRemainingCard = styled.div<{ left: number }>`
   position: absolute;
   transform: ${(p) => `translateX(${p.left}px) translateY(${p.left}px)`};
-  rotate: ${p => `${p.left / 10}deg`};
+  rotate: ${(p) => `${p.left / 10}deg`};
   > img {
-    border: 1px solid rgba(0,0,0,0.5);
+    border: 1px solid rgba(0, 0, 0, 0.5);
     border-radius: 10px;
   }
 `;
@@ -55,4 +58,4 @@ export const StyledRemainingCard = styled.div<{ left: number }>`
 export const StyledTrumpImage = styled.img`
   height: 100px;
   object-fit: contain;
-`
+`;
