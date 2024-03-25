@@ -2,13 +2,14 @@ import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
 import { database } from "../configs";
 import { FIREBASE_PATHS } from "../constants";
-import { TGame, TGameRequest, TNotification, TUser } from "../types";
+import { TConnectedUser, TGame, TGameRequest, TNotification, TUser, TUserRequest } from "../types";
 import { useUserContext } from "../contexts";
 import { useFirebase } from "./useFirebase";
+import { getDatabase, onValue, ref } from "firebase/database";
 
 export const useGames = () => {
   const { user } = useUserContext();
-  const { getData } = useFirebase();
+  const { getData, getRealtimeData } = useFirebase();
 
   const [games, setGames] = useState<TGame[]>([]);
   const [activeGameRequest, setActiveGameRequest] =
@@ -34,28 +35,28 @@ export const useGames = () => {
 
   const followToGameRequestCollection = useCallback(() => {
     if (!user) return;
-    const unSub = onSnapshot(
-      doc(database, FIREBASE_PATHS.USERS_NOTIFICATIONS, String(user.id)),
-      async (doc) => {
-        const notification = doc.data() as TNotification;
-        if (!notification?.game) {
-          setActiveGameRequest(null);
-          return;
-        }
-        const { code, finishedAt, requestUserId } = notification.game;
-        const game = await getData<TGame>(FIREBASE_PATHS.GAMES, code);
-        const requestUser = await getData<TUser>(
-          FIREBASE_PATHS.USERS,
-          String(requestUserId)
-        );
-        if (!game || !requestUser) return;
-        setActiveGameRequest({ finishedAt, game, requestUser });
+    const db = getDatabase();
+    const userRef = ref(db, `${FIREBASE_PATHS.CONNECTED_USERS}/${user.id}`);
+    const unSub = onValue(userRef, async (userSnapshot) => {
+      if (!userSnapshot.exists()) {
+        setActiveGameRequest(null);
+        return;
+      };
+      const userInfo = userSnapshot.val() as TConnectedUser;
+      if (!userInfo.gameRequest) {
+        setActiveGameRequest(null);
+        return;
       }
-    );
+      const { finishedAt, friendId, id } = userInfo.gameRequest
+      const game = await getRealtimeData<TGame>(FIREBASE_PATHS.GAMES, String(id));
+      const requestUser = await getData<TUser>(FIREBASE_PATHS.USERS, String(friendId));
+      if (!game || !requestUser) return;
+      setActiveGameRequest({ finishedAt, game, requestUser });
+    })
     return () => {
       unSub();
     };
-  }, [getData, user]);
+  }, [getData, getRealtimeData, user]);
 
   useEffect(followToGamesCollection, [followToGamesCollection]);
   useEffect(followToGameRequestCollection, [followToGameRequestCollection]);

@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { useAppLoadingContext, useUserContext } from "../contexts";
-import { TFriendFindRequest, TNotification, TUser } from "../types";
+import { TConnectedUser, TFriendFindRequest, TNotification, TUser } from "../types";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { database } from "../configs";
 import { FIREBASE_PATHS, GAME_REQUEST_TIME } from "../constants";
@@ -18,7 +18,7 @@ export const useFriends = () => {
 
   const [foundUsers, setFoundUsers] = useState<TUser[]>([]);
 
-  const { changeData, getData } = useFirebase();
+  const { changeData, getData, getRealtimeData, changeRealtimeData } = useFirebase();
 
   const findFriends = useCallback(
     async (values: TFriendFindRequest) => {
@@ -212,30 +212,24 @@ export const useFriends = () => {
       if (!currentUser) return;
       try {
         setAppLoading(true);
-        const prevData = await getData<TNotification>(
-          FIREBASE_PATHS.USERS_NOTIFICATIONS,
-          String(userId)
-        );
-        const userIsHaveActiveGameRequest = Boolean(prevData?.game);
-        if (userIsHaveActiveGameRequest) {
+        const foundData = await getRealtimeData<TConnectedUser>(FIREBASE_PATHS.CONNECTED_USERS, String(userId));
+
+        if (!foundData) return;
+
+        if (foundData?.gameRequest) {
           notification("User is have active game request", "error");
           return;
         }
-        const createdAt = String(new Date());
-        const finishedAt = String(calculateGamerStepTime(GAME_REQUEST_TIME));
-        const gameData = {
-          code: String(gameId),
-          createdAt,
-          finishedAt,
-          requestUserId: currentUser.id,
-        };
-        const newData = { ...prevData, game: gameData };
 
-        await changeData(
-          FIREBASE_PATHS.USERS_NOTIFICATIONS,
-          String(userId),
-          newData
-        );
+        const finishedAt = String(calculateGamerStepTime(GAME_REQUEST_TIME));
+        const gameRequest = {
+          id: gameId,
+          finishedAt,
+          friendId: currentUser.id,
+        };
+        const newData = { ...foundData, gameRequest };
+
+        await changeRealtimeData(FIREBASE_PATHS.CONNECTED_USERS, String(userId), newData)
         notification("Game request successfully sended!", "success");
       } catch (error) {
         console.error(error);
@@ -243,52 +237,39 @@ export const useFriends = () => {
         setAppLoading(false);
       }
     },
-    [changeData, currentUser, getData, setAppLoading]
+    [changeRealtimeData, currentUser, getRealtimeData, setAppLoading]
   );
 
   const rejectGameRequest = useCallback(async () => {
     if (!currentUser) return;
     try {
       setAppLoading(true);
-      const data = await getData<TNotification>(
-        FIREBASE_PATHS.USERS_NOTIFICATIONS,
-        String(currentUser.id)
-      );
-      if (!data) return;
-
-      await changeData(
-        FIREBASE_PATHS.USERS_NOTIFICATIONS,
-        String(currentUser.id),
-        { ...data, game: null }
-      );
+      const foundData = await getRealtimeData<TConnectedUser>(FIREBASE_PATHS.CONNECTED_USERS, String(currentUser.id));
+      if (!foundData) return;
+      delete foundData.gameRequest
+      await changeRealtimeData(FIREBASE_PATHS.CONNECTED_USERS, String(currentUser.id), foundData)
     } catch (error) {
       console.error(error);
     } finally {
       setAppLoading(false);
     }
-  }, [changeData, currentUser, getData, setAppLoading]);
+  }, [changeRealtimeData, currentUser, getRealtimeData, setAppLoading]);
 
   const acceptGameRequest = useCallback(async () => {
     if (!currentUser) return;
     try {
       setAppLoading(true);
-      const data = await getData<TNotification>(
-        FIREBASE_PATHS.USERS_NOTIFICATIONS,
-        String(currentUser.id)
-      );
-      if (!data?.game) return;
-      await changeData(
-        FIREBASE_PATHS.USERS_NOTIFICATIONS,
-        String(currentUser.id),
-        { ...data, game: null }
-      );
-      await joinToGame({ code: data.game.code });
+      const foundData = await getRealtimeData<TConnectedUser>(FIREBASE_PATHS.CONNECTED_USERS, String(currentUser.id));
+      if (!foundData?.gameRequest) return;
+      await joinToGame({ code: String(foundData.gameRequest.id) });
+      delete foundData.gameRequest
+      await changeRealtimeData(FIREBASE_PATHS.CONNECTED_USERS, String(currentUser.id), foundData)
     } catch (error) {
       console.error(error);
     } finally {
       setAppLoading(false);
     }
-  }, [changeData, currentUser, getData, joinToGame, setAppLoading]);
+  }, [changeRealtimeData, currentUser, getRealtimeData, joinToGame, setAppLoading]);
 
   return {
     foundUsers,

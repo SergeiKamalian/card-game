@@ -49,12 +49,12 @@ const GameComponent = memo(() => {
 
   useEffect(() => {
     if (!game) return;
-    disconnectUserFromGame(game);
+    // disconnectUserFromGame(game);
   }, [disconnectUserFromGame, game]);
 
-  // if (!game?.started) {
-  //   return <Starting />;
-  // }
+  if (!game?.started) {
+    return <Starting />;
+  }
 
   // if (!userGamer || !gameTimes || !game) {
   //   return null;

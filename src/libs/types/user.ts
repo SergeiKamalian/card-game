@@ -21,3 +21,12 @@ export type TUserForm = {
     name: string;
     password: string;
 }
+
+export type TConnectedUser = {
+    connected: boolean;
+    gameRequest?: {
+        id: number;
+        finishedAt: string;
+        friendId: number;
+    }
+}

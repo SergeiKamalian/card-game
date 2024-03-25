@@ -22,7 +22,7 @@ import {
 } from "../constants";
 import { useNavigate } from "react-router";
 import { useTimer } from "./useTimer";
-import { get, getDatabase, onDisconnect, ref } from "firebase/database";
+import { getDatabase, onDisconnect, ref } from "firebase/database";
 import { notification } from "../ui";
 
 export const useGameConnection = () => {
