@@ -6,7 +6,7 @@ import { TableCards } from "./components";
 export const GameTable = memo(() => {
   const { game, closeAttackCardHandler } = useGameContext();
 
-  if (!game) return null;
+  if (!game || !game.inTableCards) return null;
 
   return (
     <StyledGameTable>

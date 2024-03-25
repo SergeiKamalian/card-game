@@ -20,7 +20,7 @@ export const GamerInterfaceActions = memo(
       () =>
         game?.defender === user?.name &&
         !game?.defenderSurrendered &&
-        (game?.inTableCards as TCard[][]).some(
+        (game?.inTableCards as TCard[][])?.some(
           (cardGroup) => cardGroup.length === 1
         ),
       [game, user]
@@ -30,10 +30,10 @@ export const GamerInterfaceActions = memo(
       const isAttackerCards = game?.attacker === user?.name;
       if (!isAttackerCards) return false;
 
-      const onTableAllCardsIsClosed = (game?.inTableCards as TCard[][]).every(
+      const onTableAllCardsIsClosed = (game?.inTableCards as TCard[][])?.every(
         (cardGroup) => cardGroup.length === 2
       );
-      const tableIsNotEmpty = game?.inTableCards.length;
+      const tableIsNotEmpty = game?.inTableCards?.length;
 
       if (
         (onTableAllCardsIsClosed && tableIsNotEmpty) ||

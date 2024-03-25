@@ -25,7 +25,7 @@ export const GamerInterface = memo((props: GamerInterfaceProps) => {
   if (!userGamer) return null;
   return (
     <StyledGamerInterface>
-      <RestGamer
+       <RestGamer
         game={game}
         gameTimes={gameTimes}
         restGamer={userGamer}
@@ -35,7 +35,7 @@ export const GamerInterface = memo((props: GamerInterfaceProps) => {
         <GamerInterfaceCards gamer={userGamer} />
       </StyledGamerInterfaceContent>
 
-      <GamerInterfaceActions game={game} />
+     <GamerInterfaceActions game={game} />
     </StyledGamerInterface>
   );
 });

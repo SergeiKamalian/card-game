@@ -46,14 +46,8 @@ export const useTimer = () => {
 
     const followTheGameTimes = useCallback(() => {
         if (!game) return;
-        const unSub = onSnapshot(doc(database, FIREBASE_PATHS.GAMES_TIMES, String(game.code)), (doc) => {
-            const gameTimes = doc.data() as TGameTimes;
-
-            setGameTimes(gameTimes)
-        })
-        return () => {
-            unSub()
-        }
+        const gameTimes = game.gamersTimes;
+        setGameTimes(gameTimes)
     }, [game])
 
     const getGameUpdatedTimes = useCallback(async ({ attackerMinutes, defenderMinutes, gameId }: TGetGameUpdatedTimes) => {
@@ -65,8 +59,8 @@ export const useTimer = () => {
                 && (typeof defenderMinutes === 'number' ? calculateGamerStepTime(defenderMinutes) : null);
 
             const newTimes = {
-                ...(defenderFinishTime && { defenderFinishTime: String(defenderFinishTime) }),
-                ...(attackerFinishTime && { attackerFinishTime: String(attackerFinishTime) }),
+                defenderFinishTime: defenderFinishTime ? String(defenderFinishTime) : null,
+                attackerFinishTime: attackerFinishTime ? String(attackerFinishTime) : null,
             }
 
             const data = gameTimes ? { ...gameTimes, ...newTimes } : newTimes

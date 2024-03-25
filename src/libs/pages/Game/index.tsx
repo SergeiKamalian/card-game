@@ -21,27 +21,27 @@ const GameComponent = memo(() => {
   const {
     followToGame,
     game,
-    // userGamer,
-    // restGamers,
+    userGamer,
+    restGamers,
     // gameIsFinished,
     // followGamersStatuses,
   } = useGameContext();
-  // const {
-  //   gameTimes,
-  //   followTheGameTimes,
-  //   followTheAttackerTime,
-  //   followTheDefenderTime,
-  // } = useTimerContext();
+  const {
+    gameTimes,
+    followTheGameTimes,
+    followTheAttackerTime,
+    followTheDefenderTime,
+  } = useTimerContext();
 
   const { disconnectUserFromGame } = useGameConnection();
 
   useEffect(followToGame, [followToGame]);
 
-  // useEffect(followTheAttackerTime, [followTheAttackerTime]);
+  useEffect(followTheAttackerTime, [followTheAttackerTime]);
 
-  // useEffect(followTheDefenderTime, [followTheDefenderTime]);
+  useEffect(followTheDefenderTime, [followTheDefenderTime]);
 
-  // useEffect(followTheGameTimes, [followTheGameTimes]);
+  useEffect(followTheGameTimes, [followTheGameTimes]);
 
   // useEffect(() => {
   //   followGamersStatuses();
@@ -56,13 +56,15 @@ const GameComponent = memo(() => {
     return <Starting />;
   }
 
-  // if (!userGamer || !gameTimes || !game) {
-  //   return null;
-  // }
+  console.log(game)
+
+  if (!userGamer || !gameTimes || !game) {
+    return null;
+  }
 
   return (
     <>
-      {/* <StyledGame>
+      <StyledGame>
         <StyledGameTopBlock>
           <RemainingCards game={game} />
           <RestGamers
@@ -72,13 +74,13 @@ const GameComponent = memo(() => {
           />
           <BitoCards game={game} />
         </StyledGameTopBlock>
-        <GameTable />
+         <GameTable />
         <GamerInterface
           game={game}
           restGamers={restGamers}
           gameTimes={gameTimes}
         />
-      </StyledGame> */}
+      </StyledGame>
       {/* <Modal
         isOpen={gameIsFinished}
         content={<span>finished</span>}
