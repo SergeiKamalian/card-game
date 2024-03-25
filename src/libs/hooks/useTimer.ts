@@ -9,7 +9,7 @@ import { calculateGamerStepTime } from "../utils/timer";
 import { useFirebase } from "./useFirebase";
 
 export const useTimer = () => {
-    
+
     const { user } = useUserContext()
     const { game, suspendAttacker } = useGameContext()
     const { changeData } = useFirebase()
@@ -26,7 +26,6 @@ export const useTimer = () => {
             const currentTime = new Date();
 
             if (currentTime > attackerFinishTime) suspendAttacker()
-            if (currentTime > attackerFinishTime) console.log()
         };
         const id = setInterval(checkAttackerFinishTime, 5000);
         return () => clearInterval(id);
@@ -46,7 +45,7 @@ export const useTimer = () => {
     }, [game, gameTimes, user?.name])
 
     const followTheGameTimes = useCallback(() => {
-        if (!game) return;        
+        if (!game) return;
         const unSub = onSnapshot(doc(database, FIREBASE_PATHS.GAMES_TIMES, String(game.code)), (doc) => {
             const gameTimes = doc.data() as TGameTimes;
 
@@ -71,7 +70,7 @@ export const useTimer = () => {
             }
 
             const data = gameTimes ? { ...gameTimes, ...newTimes } : newTimes
-            
+
             await changeData(FIREBASE_PATHS.GAMES_TIMES, gameId, data)
         } catch (error) {
             console.error(error)

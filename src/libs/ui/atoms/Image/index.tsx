@@ -7,6 +7,7 @@ interface ImageProps {
   width: string;
   height: string;
   borderRadius?: string;
+  objectFit?: string;
 }
 
 export const Image = memo((props: ImageProps) => {
@@ -18,4 +19,5 @@ const StyledImage = styled.img<ImageProps>`
   height: ${(p) => p.height};
   border-radius: ${(p) => p.borderRadius || "none"};
   object-fit: cover;
+  object-fit: ${(p) => p.objectFit || "cover"};
 `;

@@ -30,7 +30,7 @@ export const BitoCards = memo((props: BitoCardsProps) => {
     <StyledBitoCards>
       {new Array(haveBitoCards).fill(null).map((_, i) => (
         <StyledBitoCard key={i} rotate={(i+1) * 20}>
-          <Image alt="card" height="170px" width="100%" url={cardBack} />
+          <Image alt="card" height="170px" width="100%" url={cardBack} objectFit="contain" />
         </StyledBitoCard>
       ))}
     </StyledBitoCards>

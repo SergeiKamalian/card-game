@@ -3,3 +3,4 @@ export * from './recognizeAttackerAndDefenderOnFinishLap';
 export * from './recognizeAttackerAndDefenderOnStart';
 export * from './updateGamersOnFinishLap';
 export * from './giveRemainingAndBitoCardsCount'
+export * from './recognizeAttackerOnTransferPlace'

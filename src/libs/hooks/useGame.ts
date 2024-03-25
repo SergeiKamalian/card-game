@@ -9,6 +9,7 @@ import {
   checkAttackerCard,
   checkDefenderCard,
   recognizeAttackerAndDefenderOnFinishLap,
+  recognizeAttackerOnTransferPlace,
   removeCardFromDeck,
   updateGamersOnFinishLap,
 } from "../utils";
@@ -351,31 +352,10 @@ export const useGame = () => {
   const transferAttackerPlace = useCallback(async () => {
     try {
       if (!game) return;
-
-      const prevAttackerIndex =
-        game?.gamers.find(({ info }) => info.name === game.attacker)?.index ||
-        0;
-
-      const prevDefenderIndex =
-        game?.gamers.find(({ info }) => info.name === game.defender)?.index ||
-        0;
-
-      const nextAttackerIndex =
-        prevAttackerIndex + 1 === prevDefenderIndex
-          ? prevAttackerIndex + 2
-          : prevAttackerIndex + 1;
-
-      const readyNewAttacker = game?.gamers.find(
-        ({ index }) =>
-          index ===
-          (nextAttackerIndex === game.gamers.length ? 0 : nextAttackerIndex)
-      )?.info.name;
-      const newAlreadyPlayedAttackersCount =
-        game.alreadyPlayedAttackersCount + 1;
-
+      const newAttacker = recognizeAttackerOnTransferPlace(game);
       await updateGame({
-        attacker: readyNewAttacker,
-        alreadyPlayedAttackersCount: newAlreadyPlayedAttackersCount,
+        attacker: newAttacker,
+        alreadyPlayedAttackersCount: game.alreadyPlayedAttackersCount + 1,
       });
       await changeGameTimes({
         attackerMinutes: GAMERS_TIMES.ATTACKER,

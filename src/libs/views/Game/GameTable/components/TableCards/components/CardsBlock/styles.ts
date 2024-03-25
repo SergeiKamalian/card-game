@@ -13,6 +13,7 @@ export const StyledAttackerCard = styled.div<{isFinish: boolean}>`
   border: 1px solid rgba(0, 0, 0, 0.2);
   box-shadow: -5px 5px 5px hsla(0, 0%, 0%, 0.20);
   cursor: ${p => !p.isFinish && 'pointer'};
+  rotate: -2deg;
 `;
 export const StyledDefenderCard = styled.div`
   width: 136px;
