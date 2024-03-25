@@ -21,48 +21,48 @@ const GameComponent = memo(() => {
   const {
     followToGame,
     game,
-    userGamer,
-    restGamers,
-    gameIsFinished,
-    followGamersStatuses,
+    // userGamer,
+    // restGamers,
+    // gameIsFinished,
+    // followGamersStatuses,
   } = useGameContext();
-  const {
-    gameTimes,
-    followTheGameTimes,
-    followTheAttackerTime,
-    followTheDefenderTime,
-  } = useTimerContext();
+  // const {
+  //   gameTimes,
+  //   followTheGameTimes,
+  //   followTheAttackerTime,
+  //   followTheDefenderTime,
+  // } = useTimerContext();
 
   const { disconnectUserFromGame } = useGameConnection();
 
   useEffect(followToGame, [followToGame]);
 
-  useEffect(followTheAttackerTime, [followTheAttackerTime]);
+  // useEffect(followTheAttackerTime, [followTheAttackerTime]);
 
-  useEffect(followTheDefenderTime, [followTheDefenderTime]);
+  // useEffect(followTheDefenderTime, [followTheDefenderTime]);
 
-  useEffect(followTheGameTimes, [followTheGameTimes]);
+  // useEffect(followTheGameTimes, [followTheGameTimes]);
 
-  useEffect(() => {
-    followGamersStatuses();
-  }, [followGamersStatuses]);
+  // useEffect(() => {
+  //   followGamersStatuses();
+  // }, [followGamersStatuses]);
 
   useEffect(() => {
     if (!game) return;
     disconnectUserFromGame(game);
   }, [disconnectUserFromGame, game]);
 
-  if (!game?.started) {
-    return <Starting />;
-  }
+  // if (!game?.started) {
+  //   return <Starting />;
+  // }
 
-  if (!userGamer || !gameTimes || !game) {
-    return null;
-  }
+  // if (!userGamer || !gameTimes || !game) {
+  //   return null;
+  // }
 
   return (
     <>
-      <StyledGame>
+      {/* <StyledGame>
         <StyledGameTopBlock>
           <RemainingCards game={game} />
           <RestGamers
@@ -78,12 +78,12 @@ const GameComponent = memo(() => {
           restGamers={restGamers}
           gameTimes={gameTimes}
         />
-      </StyledGame>
-      <Modal
+      </StyledGame> */}
+      {/* <Modal
         isOpen={gameIsFinished}
         content={<span>finished</span>}
         title="Game is finished!"
-      />
+      /> */}
     </>
   );
 });

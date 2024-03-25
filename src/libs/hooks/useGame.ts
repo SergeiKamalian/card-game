@@ -31,7 +31,7 @@ export const useGame = () => {
     (store: RootState) => store.gameReducer.defenderSelectedCard
   );
 
-  const { changeGameTimes } = useTimer();
+  const { getGameUpdatedTimes } = useTimer();
 
   const { changeData, getData } = useFirebase();
 
@@ -73,16 +73,13 @@ export const useGame = () => {
 
   const followToGame = useCallback(() => {
     if (!id) return;
-    const unSub = onSnapshot(doc(database, FIREBASE_PATHS.GAMES, id), (doc) => {
-      const game = doc.data() as TGame;
-      //* JSON.parse for Firebase inside arrays issue
-      setGame({
-        ...game,
-        inTableCards: JSON.parse(
-          (game?.inTableCards as string) || ""
-        ) as TCard[][],
-      });
-    });
+    const db = getDatabase();
+    const gameRef = ref(db, `${FIREBASE_PATHS.GAMES}/${id}`);
+    const unSub = onValue(gameRef, async (gameSnapshot) => {
+      if (!gameSnapshot.exists()) return;
+      const game = gameSnapshot.val() as TGame;
+      setGame(game);
+    })
     return () => {
       unSub();
     };
@@ -204,18 +201,18 @@ export const useGame = () => {
           gamers: newGamers,
         };
         await updateGame(newGame);
-        await changeGameTimes({
-          attackerMinutes: null,
-          defenderMinutes: GAMERS_TIMES.DEFENDER,
-          gameId: String(game.code),
-        });
+        // await changeGameTimes({
+        //   attackerMinutes: null,
+        //   defenderMinutes: GAMERS_TIMES.DEFENDER,
+        //   gameId: String(game.code),
+        // });
 
         await checkGamerFinishStatus(newGame, currentGamer.info.name);
       } catch (error) {
         console.error(error);
       }
     },
-    [changeGameTimes, checkGamerFinishStatus, currentGamer, game, updateGame]
+    [checkGamerFinishStatus, currentGamer, game, updateGame]
   );
 
   const handleSelectCard = useCallback(
@@ -297,11 +294,11 @@ export const useGame = () => {
           ? null
           : GAMERS_TIMES.ATTACKER;
 
-        await changeGameTimes({
-          attackerMinutes: attackerNewMinutes,
-          defenderMinutes: defenderNewMinutes,
-          gameId: String(game.code),
-        });
+        // await changeGameTimes({
+        //   attackerMinutes: attackerNewMinutes,
+        //   defenderMinutes: defenderNewMinutes,
+        //   gameId: String(game.code),
+        // });
         const updatedGame: TGame = {
           ...game,
           ...newGame,
@@ -312,7 +309,7 @@ export const useGame = () => {
       }
     },
     [
-      changeGameTimes,
+      // changeGameTimes,
       checkGamerFinishStatus,
       currentGamer,
       defenderSelectedCard,
@@ -340,14 +337,14 @@ export const useGame = () => {
       };
 
       await updateGame(updatedGame);
-      await changeGameTimes({
-        attackerMinutes: GAMERS_TIMES.ATTACKER,
-        gameId: String(game.code),
-      });
+      // await changeGameTimes({
+      //   attackerMinutes: GAMERS_TIMES.ATTACKER,
+      //   gameId: String(game.code),
+      // });
     } catch (error) {
       console.error(error);
     }
-  }, [changeGameTimes, game, updateGame]);
+  }, [game, updateGame]);
 
   const transferAttackerPlace = useCallback(async () => {
     try {
@@ -357,14 +354,14 @@ export const useGame = () => {
         attacker: newAttacker,
         alreadyPlayedAttackersCount: game.alreadyPlayedAttackersCount + 1,
       });
-      await changeGameTimes({
-        attackerMinutes: GAMERS_TIMES.ATTACKER,
-        gameId: String(game.code),
-      });
+      // await changeGameTimes({
+      //   attackerMinutes: GAMERS_TIMES.ATTACKER,
+      //   gameId: String(game.code),
+      // });
     } catch (error) {
       console.error(error);
     }
-  }, [changeGameTimes, game, updateGame]);
+  }, [game, updateGame]);
 
   const finishUserTurnHandler = useCallback(async () => {
     try {
@@ -424,14 +421,14 @@ export const useGame = () => {
       notification(`${game.attacker} is left game!`, "info");
 
       await updateGame(updatedGame);
-      await changeGameTimes({
-        attackerMinutes: GAMERS_TIMES.ATTACKER,
-        gameId: String(game.code),
-      });
+      // await changeGameTimes({
+      //   attackerMinutes: GAMERS_TIMES.ATTACKER,
+      //   gameId: String(game.code),
+      // });
     } catch (error) {
       console.error(error);
     }
-  }, [changeGameTimes, game, updateGame]);
+  }, [game, updateGame]);
 
   return {
     id,

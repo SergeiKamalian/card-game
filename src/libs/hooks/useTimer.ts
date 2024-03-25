@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react"
 import { clearInterval, setInterval } from "worker-timers";
 import { useGameContext, useUserContext } from "../contexts";
-import { TChangeGameTimes, TGameTimes } from "../types";
+import { TGetGameUpdatedTimes, TGameTimes } from "../types";
 import { FIREBASE_PATHS } from "../constants";
 import { doc, onSnapshot } from "firebase/firestore";
 import { database } from "../configs";
@@ -56,7 +56,7 @@ export const useTimer = () => {
         }
     }, [game])
 
-    const changeGameTimes = useCallback(async ({ attackerMinutes, defenderMinutes, gameId }: TChangeGameTimes) => {
+    const getGameUpdatedTimes = useCallback(async ({ attackerMinutes, defenderMinutes, gameId }: TGetGameUpdatedTimes) => {
         try {
             const attackerFinishTime = typeof attackerMinutes !== 'undefined'
                 && (typeof attackerMinutes === 'number' ? calculateGamerStepTime(attackerMinutes) : null);
@@ -71,16 +71,16 @@ export const useTimer = () => {
 
             const data = gameTimes ? { ...gameTimes, ...newTimes } : newTimes
 
-            await changeData(FIREBASE_PATHS.GAMES_TIMES, gameId, data)
+            return data;
         } catch (error) {
             console.error(error)
         }
-    }, [changeData, gameTimes])
+    }, [gameTimes])
 
     return {
         gameTimes,
         followTheGameTimes,
-        changeGameTimes,
+        getGameUpdatedTimes,
         followTheAttackerTime,
         followTheDefenderTime,
     }

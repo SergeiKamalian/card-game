@@ -1,6 +1,6 @@
 import {
   TCard,
-  TChangeGameTimes,
+  TGetGameUpdatedTimes,
   TFriendFindRequest,
   TGame,
   TGameTimes,
@@ -45,7 +45,7 @@ export const GAME_CONTEXT_DEFAULT_VALUES = {
 export const TIMER_CONTEXT_DEFAULT_VALUES = {
   gameTimes: null as TGameTimes | null,
   followTheGameTimes: () => {},
-  changeGameTimes: ({ gameId }: TChangeGameTimes) => {},
+  getGameUpdatedTimes: ({ gameId }: TGetGameUpdatedTimes) => {},
   followTheAttackerTime: () => {},
   followTheDefenderTime: () => {},
 };

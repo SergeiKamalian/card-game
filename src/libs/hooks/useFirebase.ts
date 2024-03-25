@@ -2,6 +2,7 @@ import { collection, deleteDoc, doc, getDoc, getDocs, setDoc } from "firebase/fi
 import { useCallback } from "react"
 import { FIREBASE_PATHS } from "../constants";
 import { database } from "../configs";
+import { get, getDatabase, ref, set } from "firebase/database";
 
 export const useFirebase = () => {
 
@@ -46,10 +47,33 @@ export const useFirebase = () => {
         }
     }, [])
 
+    const getRealtimeData = useCallback(async<T>(path: FIREBASE_PATHS, pathSegment: string): Promise<T | null> => {
+        const db = getDatabase();
+        const realtimeRef = ref(db, `${path}/${pathSegment}`);
+        const snapshot = await get(realtimeRef);
+        let data: null | T = null;
+        if (snapshot.exists()) {
+            data = snapshot.val() as T;
+        }
+        return data
+    }, [])
+
+    const changeRealtimeData = useCallback(async (path: FIREBASE_PATHS, pathSegment: string, data: unknown) => {
+        try {
+            const db = getDatabase();
+            const realtimeRef = ref(db, `${path}/${pathSegment}`);
+            await set(realtimeRef, data)
+        } catch (error) {
+            console.error(error)
+        }
+    }, [])
+
     return {
         getData,
         changeData,
         deleteData,
-        getCollection
+        getCollection,
+        changeRealtimeData,
+        getRealtimeData
     }
 }

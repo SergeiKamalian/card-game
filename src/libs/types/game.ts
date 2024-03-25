@@ -30,6 +30,7 @@ export type TGame = {
   trump: TTrump;
   gamersCount: number;
   started: boolean;
+  finished: boolean;
   remainingCards: TCard[];
   private: boolean;
   coins: number;
@@ -41,6 +42,7 @@ export type TGame = {
   alreadyPlayedAttackersCount: number;
   defenderSurrendered: boolean;
   finishedGamersPlaces: TFinisherPlace[];
+  gamersTimes: TGameTimes;
 };
 
 export type TGameTimes = {
@@ -48,7 +50,7 @@ export type TGameTimes = {
   defenderFinishTime: string | null;
 };
 
-export type TChangeGameTimes = {
+export type TGetGameUpdatedTimes = {
   attackerMinutes?: number | null;
   defenderMinutes?: number | null;
   gameId: string;

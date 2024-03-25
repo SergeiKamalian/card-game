@@ -22,80 +22,64 @@ import {
 } from "../constants";
 import { useNavigate } from "react-router";
 import { useTimer } from "./useTimer";
-import { get, getDatabase, onDisconnect, ref, set } from "firebase/database";
+import { get, getDatabase, onDisconnect, ref } from "firebase/database";
+import { notification } from "../ui";
 
 export const useGameConnection = () => {
   const { user } = useUserContext();
   const { cards } = useAppContext();
-  const { changeData, getData } = useFirebase();
+  const { changeRealtimeData, getRealtimeData } = useFirebase();
   const navigate = useNavigate();
-  const { changeGameTimes } = useTimer();
-
-  const connectUserToGamer = useCallback(
-    async (gameCode: string) => {
-      if (!user) return;
-      try {
-        const db = getDatabase();
-        const gamesRef = ref(db, `${FIREBASE_PATHS.GAMES}/${gameCode}`);
-        let data: null | {
-          gamers: { id: number; name: string; status: GAMER_STATUSES }[];
-        } = null;
-        const snapshot = await get(gamesRef);
-        if (snapshot.exists()) {
-          data = snapshot.val();
-        }
-        const userData = {
-          id: user.id,
-          name: user.name,
-          status: GAMER_STATUSES.ACTIVE,
-        };
-        set(gamesRef, {
-          gamers: !data ? [userData] : [...data.gamers, userData],
-        });
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    [user]
-  );
+  const { getGameUpdatedTimes } = useTimer();
 
   const disconnectUserFromGame = useCallback(
     async (game: TGame) => {
       if (!user) return;
       try {
+        const gameData = await getRealtimeData<TGame>(FIREBASE_PATHS.GAMES, String(game.code));
         const db = getDatabase();
-        const gamesRef = ref(db, `${FIREBASE_PATHS.GAMES}/${game.code}`);
-        let data: null | {
-          gamers: { id: number; name: string; status: GAMER_STATUSES }[];
-        } = null;
-        const snapshot = await get(gamesRef);
-        if (snapshot.exists()) {
-          data = snapshot.val();
+        const gameRef = ref(db, `${FIREBASE_PATHS.GAMES}/${game.code}`);
+        const disconnectRef = onDisconnect(gameRef);
+        if (!gameData) return;
+        const updatedGamers = gameData.gamers.map(gamer => {
+          if (gamer.id === user.id) return {
+            ...gamer,
+            status: GAMER_STATUSES.SUSPENDED,
+          }
+          return gamer;
+        })
+        const activeGamers = updatedGamers.filter(({ status }) => status === GAMER_STATUSES.ACTIVE);
+        if (!activeGamers.length) {
+          await disconnectRef.remove()
+          return;
         }
-        const disconnectRef = onDisconnect(gamesRef);
-        const newData = data?.gamers.map((item) => {
-          if (item.id === user.id)
-            return {
-              ...item,
-              status: GAMER_STATUSES.SUSPENDED,
-            };
-
-          return item;
-        });
-        if (!newData) return;
-        disconnectRef.set({ gamers: newData });
+        if (activeGamers.length === 1) {
+          const gameDataWithSingleActiveGamer = {
+            ...gameData,
+            gamers: updatedGamers,
+            finishedGamersPlaces: [{ gamer: activeGamers[0], place: 1 }],
+            finished: true
+          }
+          await disconnectRef.set(gameDataWithSingleActiveGamer)
+          return;
+        }
+        const updatedData: TGame = {
+          ...gameData,
+          gamers: updatedGamers
+        }
+        disconnectRef.set(updatedData);
       } catch (error) {
         console.error(error);
       }
     },
-    [user]
+    [getRealtimeData, user]
   );
 
   const createGame = useCallback(
     async (creatingForm: TGameCreateRequest) => {
       try {
         if (!user || !cards) return;
-
+        //todo
         const testCards = cards.slice(0, 15);
 
         const gameCode = generateGameCode();
@@ -132,25 +116,29 @@ export const useGameConnection = () => {
           gamers,
           attacker: null,
           defender: null,
-          inTableCards: "[]",
+          inTableCards: [],
           alreadyPlayedAttackersCount: 0,
           defenderSurrendered: false,
           gamersCount: Number(creatingForm.gamersCount),
           finishedGamersPlaces: [],
+          finished: false,
+          gamersTimes: {
+            attackerFinishTime: null,
+            defenderFinishTime: null
+          }
         };
 
-        await changeData(
+        await changeRealtimeData(
           FIREBASE_PATHS.GAMES,
           String(requestData.code),
           requestData
         );
-        await connectUserToGamer(String(gameCode));
         navigate(`${APP_ROUTES.GAME}/${requestData.code}`);
       } catch (error) {
         console.error(error);
       }
     },
-    [user, cards, changeData, connectUserToGamer, navigate]
+    [user, cards, changeRealtimeData, navigate]
   );
 
   const joinToGame = useCallback(
@@ -158,23 +146,23 @@ export const useGameConnection = () => {
       try {
         if (!user) return;
 
-        const foundGame = await getData<TGame>(
+        const foundGame = await getRealtimeData<TGame>(
           FIREBASE_PATHS.GAMES,
           joiningForm.code
         );
 
         if (!foundGame) {
-          console.log(`game with ${joiningForm.code} is not found`);
+          notification(`Game with ${joiningForm.code} is not found`, 'error');
           return;
         }
 
         if (foundGame.coins > user.coins) {
-          console.log(`you don't have that many coins`);
+          notification(`You don't have that many coins`, 'error');
           return;
         }
 
         if (Number(foundGame.gamersCount) === foundGame.gamers.length) {
-          console.log(`game with ${joiningForm.code} is crowded with players`);
+          notification(`Game with code ${joiningForm.code} is crowded with players`, 'error');
           return;
         }
 
@@ -204,37 +192,45 @@ export const useGameConnection = () => {
           foundGame.trump.trump
         );
 
+        const gameTimes = started ? await getGameUpdatedTimes({
+          attackerMinutes: GAMERS_TIMES.ATTACKER,
+          gameId: joiningForm.code,
+        }) : null
+
+
         const requestData: TGame = {
           ...foundGame,
           gamers: updatedGamers,
           remainingCards,
-          ...(started && { started, defender, attacker }),
+          ...(started && {
+            started,
+            defender,
+            attacker,
+          }),
+          ...(gameTimes && {
+            gamersTimes: {
+              attackerFinishTime: gameTimes.attackerFinishTime || null,
+              defenderFinishTime: gameTimes.defenderFinishTime || null
+            }
+          }),
         };
 
-        await changeData(
+        await changeRealtimeData(
           FIREBASE_PATHS.GAMES,
           String(requestData.code),
           requestData
         );
-        if (started) {
-          changeGameTimes({
-            attackerMinutes: GAMERS_TIMES.ATTACKER,
-            gameId: joiningForm.code,
-          });
-        }
-        await connectUserToGamer(String(requestData.code));
         navigate(`${APP_ROUTES.GAME}/${requestData.code}`);
       } catch (error) {
         console.error(error);
       }
     },
-    [changeData, changeGameTimes, connectUserToGamer, getData, navigate, user]
+    [changeRealtimeData, getGameUpdatedTimes, getRealtimeData, navigate, user]
   );
 
   return {
     createGame,
     joinToGame,
     disconnectUserFromGame,
-    connectUserToGamer,
   };
 };
