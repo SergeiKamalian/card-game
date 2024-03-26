@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router";
-import { TCard, TGame, TGamer, TGamerStatus } from "../types";
+import { TCard, TFinisherPlace, TGame, TGamer, TGamerStatus } from "../types";
 import { doc, onSnapshot } from "firebase/firestore";
 import { database } from "../configs";
 import { FIREBASE_PATHS, GAMERS_TIMES, GAMER_STATUSES } from "../constants";
@@ -8,6 +8,7 @@ import { useUserContext } from "../contexts";
 import {
   checkAttackerCard,
   checkDefenderCard,
+  checkPossibilityOfAttack,
   recognizeAttackerAndDefenderOnFinishLap,
   recognizeAttackerOnTransferPlace,
   removeCardFromDeck,
@@ -40,10 +41,10 @@ export const useGame = () => {
   const [gameIsFinished, setGameIsFinished] = useState(false);
 
   const gameRef = useMemo(() => {
-    if (!game) return null;
+    if (!id) return null;
     const db = getDatabase();
-    return ref(db, `${FIREBASE_PATHS.GAMES}/${game.code}`);
-  }, [game]);
+    return ref(db, `${FIREBASE_PATHS.GAMES}/${id}`);
+  }, [id]);
 
   const currentGamer = useMemo(
     () => game?.gamers.find(({ info }) => info.name === user?.name),
@@ -72,25 +73,27 @@ export const useGame = () => {
   }, [game?.gamers, user?.name]);
 
   const followToGame = useCallback(() => {
-    if (!id) return;
-    const db = getDatabase();
-    const gameRef = ref(db, `${FIREBASE_PATHS.GAMES}/${id}`);
+    if (!id || !gameRef) return;
     const unSub = onValue(gameRef, async (gameSnapshot) => {
       if (!gameSnapshot.exists()) return;
       const game = gameSnapshot.val() as TGame;
       setGame(game);
-    })
+    });
     return () => {
       unSub();
     };
-  }, [id]);
+  }, [id, gameRef]);
 
   const updateGame = useCallback(
     async (data: Partial<TGame>) => {
       try {
         if (!game) return;
         const updatedGame: TGame = { ...game, ...data };
-        await changeRealtimeData(FIREBASE_PATHS.GAMES, String(game.code), updatedGame);
+        await changeRealtimeData(
+          FIREBASE_PATHS.GAMES,
+          String(game.code),
+          updatedGame
+        );
       } catch (error) {
         console.error(error);
       }
@@ -98,76 +101,49 @@ export const useGame = () => {
     [changeRealtimeData, game]
   );
 
-  const followGamersStatuses = useCallback(async () => {
-    try {
-      if (!game || !game.started || !gameRef) return;
-      onValue(gameRef, async (gameStatusesSnapshot) => {
-        const gameStatusesData = gameStatusesSnapshot.val();
-        const gamersStatuses = gameStatusesData.gamers as TGamerStatus[];
-        const updatedGame = await getData<TGame>(
-          FIREBASE_PATHS.GAMES,
-          String(game.code)
-        );
-        if (!updatedGame) return;
-        const { gamers, finishedGamersPlaces } = updatedGame;
-        const updatedFinishedGamersPlaces = [...finishedGamersPlaces];
-        const updatedGamers = gamers.map((gamer) => {
-          const gamerStatus = gamersStatuses.find(({ id }) => id === gamer.id);
-          if (!gamerStatus) return gamer;
-          if (gamerStatus.status === gamer.status) return gamer;
-          if (gamerStatus.status === GAMER_STATUSES.FINISH) {
-            const place = updatedFinishedGamersPlaces.length + 1;
-            updatedFinishedGamersPlaces.push({ gamer, place: place });
-          }
-          return {
-            ...gamer,
-            status: gamerStatus.status,
-          };
-        });
-        await updateGame({
-          gamers: updatedGamers,
-          finishedGamersPlaces: updatedFinishedGamersPlaces,
-        });
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }, [game, gameRef, getData, updateGame]);
-
   const checkGamerFinishStatus = useCallback(
-    async (game: TGame, gamerName: string) => {
-      try {
-        const currentGamer = game.gamers.find(
-          ({ info }) => info.name === gamerName
-        );
-        if (!currentGamer || !user) return;
-        const gameIsFinished =
-          !game.remainingCards.length && !currentGamer.cards.length;
-        if (!gameIsFinished || !gameRef) return;
-        let gamersStatusesData: { gamers: TGamerStatus[] } | null = null;
-        const snapshot = await get(gameRef);
-        if (snapshot.exists()) {
-          gamersStatusesData = snapshot.val();
+    (game: TGame, gamerName: string) => {
+      const defaultValues = {
+        gamers: game.gamers,
+        finishedPlaces: game.finishedGamersPlaces || [],
+        gameIsFinished: game.finished,
+      };
+
+      const currentGamer = game.gamers.find(
+        ({ info }) => info.name === gamerName
+      );
+
+      if (!currentGamer || !user) return defaultValues;
+
+      const gameIsFinished =
+        !game.remainingCards?.length && !currentGamer.cards?.length;
+
+      if (!gameIsFinished || !gameRef) return defaultValues;
+
+      const newGamers = game.gamers.map((gamer) => {
+        if (gamer.id === currentGamer.id) {
+          return { ...gamer, status: GAMER_STATUSES.FINISHED };
         }
-        if (!gamersStatusesData) return;
-        const gamerNewStatusData = {
-          id: user.id,
-          name: user.name,
-          status: GAMER_STATUSES.FINISH,
-        };
-        const updatedGamersStatusesData = gamersStatusesData.gamers.map(
-          (gamer) => {
-            if (gamer.name === gamerNewStatusData.name)
-              return gamerNewStatusData;
-            return gamer;
-          }
-        );
-        set(gameRef, {
-          gamers: updatedGamersStatusesData,
-        });
-      } catch (error) {
-        console.error(error);
-      }
+        return gamer;
+      });
+
+      const newFinishedUsers = [
+        ...(game.finishedGamersPlaces || []),
+        {
+          gamer: currentGamer,
+          place: (game.finishedGamersPlaces?.length || 0) + 1,
+        },
+      ];
+
+      const globalGameIsFinished =
+        newGamers.filter(({ status }) => status === GAMER_STATUSES.ACTIVE)
+          .length < 2;
+
+      return {
+        gamers: newGamers,
+        finishedPlaces: newFinishedUsers,
+        gameIsFinished: globalGameIsFinished,
+      };
     },
     [gameRef, user]
   );
@@ -176,6 +152,16 @@ export const useGame = () => {
     async (card: TCard) => {
       try {
         if (!game || !currentGamer) return;
+        const defenderCards =
+          game.gamers.find(({ info }) => info.name === game.defender)?.cards ||
+          [];
+        const possibleAttack = checkPossibilityOfAttack(
+          game.inTableCards,
+          defenderCards
+        );
+        if (!possibleAttack) {
+          notification("No free slots for cards!", "error");
+        }
         const isValidCard = checkAttackerCard(
           card,
           (game?.inTableCards as TCard[][]) || []
@@ -186,13 +172,16 @@ export const useGame = () => {
         }
         const newGamers = removeCardFromDeck(game, currentGamer, card);
 
-        const newInTableCards = [...(game.inTableCards as TCard[][]) || [], [card]];
+        const newInTableCards = [
+          ...((game.inTableCards as TCard[][]) || []),
+          [card],
+        ];
 
         const gamersTimes = await getGameUpdatedTimes({
           attackerMinutes: null,
           defenderMinutes: GAMERS_TIMES.DEFENDER,
           gameId: String(game.code),
-        })
+        });
 
         if (!newGamers || !gamersTimes) return;
 
@@ -200,17 +189,31 @@ export const useGame = () => {
           ...game,
           inTableCards: newInTableCards,
           gamers: newGamers,
-          gamersTimes
+          gamersTimes,
         };
 
-        await updateGame(newGame);
+        const { finishedPlaces, gameIsFinished, gamers } =
+          checkGamerFinishStatus(newGame, currentGamer.info.name);
 
-        await checkGamerFinishStatus(newGame, currentGamer.info.name);
+        const updatedGame: TGame = {
+          ...newGame,
+          finishedGamersPlaces: finishedPlaces,
+          finished: gameIsFinished,
+          gamers,
+        };
+
+        await updateGame(updatedGame);
       } catch (error) {
         console.error(error);
       }
     },
-    [checkGamerFinishStatus, currentGamer, game, getGameUpdatedTimes, updateGame]
+    [
+      checkGamerFinishStatus,
+      currentGamer,
+      game,
+      getGameUpdatedTimes,
+      updateGame,
+    ]
   );
 
   const handleSelectCard = useCallback(
@@ -269,34 +272,33 @@ export const useGame = () => {
           defenderSelectedCard
         );
         const cloneInTableCards = [...(game.inTableCards as TCard[][])];
-        cloneInTableCards[groupIndex] = [...inTableCardGroup, defenderSelectedCard];
-          console.log(cloneInTableCards)
-        const defenderNewMinutes = cloneInTableCards.some(({ length }) => length === 1) ? GAMERS_TIMES.DEFENDER : null;
-        const attackerNewMinutes = defenderNewMinutes ? null : GAMERS_TIMES.ATTACKER;
-          console.log(defenderNewMinutes);
-          console.log(attackerNewMinutes);
-          
+        cloneInTableCards[groupIndex] = [
+          ...inTableCardGroup,
+          defenderSelectedCard,
+        ];
+        const defenderNewMinutes = cloneInTableCards.some(
+          ({ length }) => length === 1
+        )
+          ? GAMERS_TIMES.DEFENDER
+          : null;
+        const attackerNewMinutes = defenderNewMinutes
+          ? null
+          : GAMERS_TIMES.ATTACKER;
+
         const gamersTimes = await getGameUpdatedTimes({
           attackerMinutes: attackerNewMinutes,
           defenderMinutes: defenderNewMinutes,
           gameId: String(game.code),
-        })
-        console.log(gamersTimes);
-        
+        });
+
         if (!newGamers || !gamersTimes) return;
 
         const newGame = {
           gamers: newGamers,
           inTableCards: cloneInTableCards,
-          gamersTimes
+          gamersTimes,
         };
         await updateGame(newGame);
-
-        // const updatedGame: TGame = {
-        //   ...game,
-        //   ...newGame,
-        // };
-        // await checkGamerFinishStatus(updatedGame, currentGamer.info.name);
       } catch (error) {
         console.error(error);
       }
@@ -312,42 +314,49 @@ export const useGame = () => {
       const { gamers: gameNewGamers, remainingCards: gameRemainingCards } =
         updateGamersOnFinishLap(game);
 
+      const gamersTimes = await getGameUpdatedTimes({
+        attackerMinutes: GAMERS_TIMES.ATTACKER,
+        defenderMinutes: null,
+        gameId: String(game.code),
+      });
+      if (!gamersTimes) return;
+
       const updatedGame = {
         attacker: newAttacker,
         defender: newDefender,
         gamers: gameNewGamers,
-        remainingCards: gameRemainingCards,
+        remainingCards: gameRemainingCards ? gameRemainingCards : [],
         alreadyPlayedAttackersCount: 0,
-        inTableCards: "[]",
+        inTableCards: [],
         defenderSurrendered: false,
+        gamersTimes,
       };
-
+      console.log(updatedGame);
+      console.log(gameRemainingCards);
       await updateGame(updatedGame);
-      // await changeGameTimes({
-      //   attackerMinutes: GAMERS_TIMES.ATTACKER,
-      //   gameId: String(game.code),
-      // });
     } catch (error) {
       console.error(error);
     }
-  }, [game, updateGame]);
+  }, [game, getGameUpdatedTimes, updateGame]);
 
   const transferAttackerPlace = useCallback(async () => {
     try {
       if (!game) return;
       const newAttacker = recognizeAttackerOnTransferPlace(game);
+      const gamersTimes = await getGameUpdatedTimes({
+        attackerMinutes: GAMERS_TIMES.ATTACKER,
+        defenderMinutes: null,
+        gameId: String(game.code),
+      });
       await updateGame({
         attacker: newAttacker,
         alreadyPlayedAttackersCount: game.alreadyPlayedAttackersCount + 1,
+        gamersTimes,
       });
-      // await changeGameTimes({
-      //   attackerMinutes: GAMERS_TIMES.ATTACKER,
-      //   gameId: String(game.code),
-      // });
     } catch (error) {
       console.error(error);
     }
-  }, [game, updateGame]);
+  }, [game, getGameUpdatedTimes, updateGame]);
 
   const finishUserTurnHandler = useCallback(async () => {
     try {
@@ -360,9 +369,11 @@ export const useGame = () => {
         newAlreadyPlayedAttackersCount === game.gamers.length - 1;
 
       if (allAttackersIsAlreadyPlays) {
+        console.log("hasav 1");
         await finishTheLap();
         return;
       }
+      console.log("hasav");
       await updateGame({
         alreadyPlayedAttackersCount: newAlreadyPlayedAttackersCount,
       });
@@ -395,26 +406,27 @@ export const useGame = () => {
       const { gamers: gameNewGamers, remainingCards: gameRemainingCards } =
         updateGamersOnFinishLap(filteredGame);
 
+      const gamersTimes = await getGameUpdatedTimes({
+        attackerMinutes: GAMERS_TIMES.ATTACKER,
+        defenderMinutes: null,
+        gameId: String(game.code),
+      });
+
       const updatedGame = {
         attacker: newAttacker,
         defender: newDefender,
         gamers: gameNewGamers,
         remainingCards: gameRemainingCards,
         alreadyPlayedAttackersCount: 0,
-        inTableCards: "[]",
+        inTableCards: [],
+        gamersTimes,
       };
 
-      notification(`${game.attacker} is left game!`, "info");
-
       await updateGame(updatedGame);
-      // await changeGameTimes({
-      //   attackerMinutes: GAMERS_TIMES.ATTACKER,
-      //   gameId: String(game.code),
-      // });
     } catch (error) {
       console.error(error);
     }
-  }, [game, updateGame]);
+  }, [game, getGameUpdatedTimes, updateGame]);
 
   return {
     id,
@@ -430,6 +442,5 @@ export const useGame = () => {
     finishUserTurnHandler,
     takeInTableCards,
     suspendAttacker,
-    followGamersStatuses,
   };
 };

@@ -14,7 +14,7 @@ export const BitoCards = memo((props: BitoCardsProps) => {
   const haveBitoCards = useMemo(() => {
     if (!game) return 0;
     const allGamersCardsCount = game.gamers?.reduce(
-      (acc, obj) => acc + obj.cards.length,
+      (acc, obj) => acc + obj.cards?.length || 0,
       0
     );
 
@@ -24,7 +24,7 @@ export const BitoCards = memo((props: BitoCardsProps) => {
     );
     return (
       36 -
-      game.remainingCards.length -
+      (game.remainingCards?.length || 0) -
       allGamersCardsCount -
       (inTableCardsCount || 0)
     );

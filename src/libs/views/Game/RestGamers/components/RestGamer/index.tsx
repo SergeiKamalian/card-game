@@ -77,7 +77,7 @@ export const RestGamer = memo((props: RestGamerProps) => {
   );
 
   const gamerIsFinished = useMemo(
-    () => restGamer?.status === GAMER_STATUSES.FINISH,
+    () => restGamer?.status === GAMER_STATUSES.FINISHED,
     [restGamer?.status]
   );
 

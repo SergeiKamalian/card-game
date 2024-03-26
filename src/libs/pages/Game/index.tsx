@@ -24,7 +24,6 @@ const GameComponent = memo(() => {
     userGamer,
     restGamers,
     // gameIsFinished,
-    // followGamersStatuses,
   } = useGameContext();
   const {
     gameTimes,
@@ -43,14 +42,12 @@ const GameComponent = memo(() => {
 
   useEffect(followTheGameTimes, [followTheGameTimes]);
 
-  // useEffect(() => {
-  //   followGamersStatuses();
-  // }, [followGamersStatuses]);
-
   useEffect(() => {
     if (!game) return;
     // disconnectUserFromGame(game);
   }, [disconnectUserFromGame, game]);
+
+  console.log(game)
 
   if (!game?.started) {
     return <Starting />;

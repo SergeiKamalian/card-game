@@ -38,7 +38,6 @@ export const GAME_CONTEXT_DEFAULT_VALUES = {
   userGamer: {} as TGamer | undefined,
   restGamers: [] as TGamer[],
   suspendAttacker: () => {},
-  followGamersStatuses: () => {},
   gameIsFinished: false,
 };
 

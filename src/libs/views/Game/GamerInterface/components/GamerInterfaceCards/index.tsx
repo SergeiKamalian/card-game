@@ -11,9 +11,13 @@ const GAMER_INTERFACE_CARDS_MAX_WIDTH = 1000;
 
 export const GamerInterfaceCards = memo((props: GamerInterfaceCardsProps) => {
   const { gamer } = props;
-  const { defenderSelectedCard, handleSelectCard, handleUnselectCard } = useGameContext();
+  const { defenderSelectedCard, handleSelectCard, handleUnselectCard } =
+    useGameContext();
 
-  const gamerCards = useMemo(() => [...gamer.cards], [gamer]);
+  const gamerCards = useMemo(
+    () => (gamer.cards ? [...gamer.cards] : []),
+    [gamer]
+  );
 
   const viewedCardsWidth = useMemo(
     () => gamerCards.length * 70 + 70,

@@ -38,7 +38,7 @@ export type TGame = {
   gamers: TGamer[];
   defender: string | null;
   attacker: string | null;
-  inTableCards: TCard[][] | string; // string for firebase issue
+  inTableCards: TCard[][];
   alreadyPlayedAttackersCount: number;
   defenderSurrendered: boolean;
   finishedGamersPlaces: TFinisherPlace[];
