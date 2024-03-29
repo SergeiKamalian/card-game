@@ -69,7 +69,7 @@ export const RestGamer = memo((props: RestGamerProps) => {
     isDefender,
   ]);
 
-  const percents = useCalculateTimer(maxTime || "", position);
+  const { seconds } = useCalculateTimer(maxTime || "", position);
 
   const gamerIsDisabled = useMemo(
     () => restGamer?.status === GAMER_STATUSES.SUSPENDED,
@@ -95,7 +95,7 @@ export const RestGamer = memo((props: RestGamerProps) => {
       {gamerIsFinished ? (
         <StyledDisconnectWrapper>
           <StyledWinnerWrapper>
-            <Winner winnerPosition={1} />
+            <Winner winnerPosition={2} />
           </StyledWinnerWrapper>
         </StyledDisconnectWrapper>
       ) : null}
@@ -121,12 +121,12 @@ export const RestGamer = memo((props: RestGamerProps) => {
       </StyledNameWrapper>
       {!isStartingView ? (
         !isUser ? (
-          <RestGamerCards cardsCount={restGamer?.cards.length || 1} />
+          <RestGamerCards cardsCount={restGamer?.cards?.length || 0} />
         ) : (
           <GamerComments position={position} />
         )
       ) : null}
-      {maxTime && <TimeScale percents={percents} />}
+      {maxTime && <TimeScale seconds={seconds} />}
       {!onInvite && (
         <StyledLevelWrapper isStartingView={isStartingView}>
           <Level level={restGamer?.info.level || 1} />

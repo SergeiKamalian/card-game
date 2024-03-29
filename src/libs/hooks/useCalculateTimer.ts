@@ -7,6 +7,7 @@ export const useCalculateTimer = (
   position: "attacker" | "defender" | null
 ) => {
   const [percents, setPercents] = useState(100);
+  const [seconds, setSeconds] = useState(30);
 
   const positionMaxSeconds = useMemo(() => {
     if (!position) return 0;
@@ -25,8 +26,9 @@ export const useCalculateTimer = (
       const currentDate = new Date();
       const differenceMs = targetDate.getTime() - currentDate.getTime();
       const remainingSeconds = Math.floor(differenceMs / 1000);
+      if (remainingSeconds < 1) return;
+      setSeconds(remainingSeconds);
       const remainingPercents = (remainingSeconds / positionMaxSeconds) * 100;
-      if (remainingPercents < 0) return;
       setPercents(remainingPercents);
     }, 1000);
     return () => {
@@ -34,5 +36,5 @@ export const useCalculateTimer = (
       setPercents(100);
     };
   }, [maxTime, positionMaxSeconds]);
-  return percents;
+  return { percents, seconds };
 };

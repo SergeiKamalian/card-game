@@ -1,24 +1,17 @@
-import { memo, useMemo } from "react";
-import { StyledHaveTimeScale, StyledTimeScale } from "./styles";
-import { useTheme } from "styled-components";
+import { memo } from "react";
+import { StyledTimeScale } from "./styles";
+import { Text } from "../../../../../../../ui";
 
 interface TimeScaleProps {
-  percents: number;
+  seconds: number;
 }
 
 export const TimeScale = memo((props: TimeScaleProps) => {
-  const { percents } = props;
-  const theme = useTheme()
-
-  const haveTimeScaleBackground = useMemo(() => {
-    if (percents > 65) return theme.colors.success
-    if (percents > 25) return theme.colors.warning
-    return theme.colors.error
-  }, [percents, theme])
+  const { seconds } = props;
 
   return (
     <StyledTimeScale>
-      <StyledHaveTimeScale width={percents} bg={haveTimeScaleBackground} />
+      <Text>{seconds}</Text>
     </StyledTimeScale>
   );
 });

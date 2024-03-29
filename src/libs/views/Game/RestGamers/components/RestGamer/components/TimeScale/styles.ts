@@ -3,18 +3,16 @@ import styled from "styled-components";
 export const StyledTimeScale = styled.div`
   width: 100%;
   height: 10px;
-  background: red;
+  width: 30px;
+  height: 30px;
+  border-radius: 0 0 10px 10px;
+  background: ${p => p.theme.colors.purple1};
   position: absolute;
   top: 0;
-  background: rgba(0, 0, 0, 0.7);
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  overflow: hidden;
+  left: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 5px black;
 `;
-export const StyledHaveTimeScale = styled.div<{ width: number, bg: string }>`
-  height: 100%;
-  width: ${(p) => `${p.width}%`};
-  background: ${p => p.bg};
-  transition: all 1.5s;
-  opacity: 1;
-`;
+

@@ -294,16 +294,35 @@ export const useGame = () => {
         if (!newGamers || !gamersTimes) return;
 
         const newGame = {
+          ...game,
           gamers: newGamers,
           inTableCards: cloneInTableCards,
           gamersTimes,
         };
-        await updateGame(newGame);
+
+        const { finishedPlaces, gameIsFinished, gamers } =
+          checkGamerFinishStatus(newGame, currentGamer.info.name);
+
+        const updatedGame: TGame = {
+          ...newGame,
+          finishedGamersPlaces: finishedPlaces,
+          finished: gameIsFinished,
+          gamers,
+        };
+
+        await updateGame(updatedGame);
       } catch (error) {
         console.error(error);
       }
     },
-    [currentGamer, defenderSelectedCard, game, getGameUpdatedTimes, updateGame]
+    [
+      checkGamerFinishStatus,
+      currentGamer,
+      defenderSelectedCard,
+      game,
+      getGameUpdatedTimes,
+      updateGame,
+    ]
   );
 
   const finishTheLap = useCallback(async () => {

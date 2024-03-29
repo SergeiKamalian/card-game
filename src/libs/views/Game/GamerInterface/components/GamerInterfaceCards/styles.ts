@@ -6,4 +6,11 @@ export const StyledGamerInterfaceCards = styled.div<{width: number}>`
     height: 95%;
     transform: translateY(50px);
     display: flex;
+    position: relative;
+    zoom: 1.2;
+`
+export const StyledCardWrapper = styled.div<{transform: string, left: number} >`
+    transform: ${p => p.transform};
+    position: absolute;
+    left: ${p => `${p.left}px`};
 `

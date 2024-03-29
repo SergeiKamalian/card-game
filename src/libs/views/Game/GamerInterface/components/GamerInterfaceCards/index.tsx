@@ -1,5 +1,5 @@
 import { memo, useMemo } from "react";
-import { StyledGamerInterfaceCards } from "./styles";
+import { StyledCardWrapper, StyledGamerInterfaceCards } from "./styles";
 import { Card } from "../../../../../ui";
 import { useGameContext } from "../../../../../contexts";
 import { TGamer } from "../../../../../types";
@@ -13,11 +13,8 @@ export const GamerInterfaceCards = memo((props: GamerInterfaceCardsProps) => {
   const { gamer } = props;
   const { defenderSelectedCard, handleSelectCard, handleUnselectCard } =
     useGameContext();
-
-  const gamerCards = useMemo(
-    () => (gamer.cards ? [...gamer.cards] : []),
-    [gamer]
-  );
+  
+  const gamerCards = useMemo(() => gamer.cards || [], [gamer]);
 
   const viewedCardsWidth = useMemo(
     () => gamerCards.length * 70 + 70,
@@ -36,18 +33,32 @@ export const GamerInterfaceCards = memo((props: GamerInterfaceCardsProps) => {
     return 140 + margin;
   }, [gamerCards.length, viewedCardsWidth]);
 
+  const stylizePlayerCard = (total: number, index: number) => {
+    const rotationRange = 15;
+    const rotation = ((index - (total - 1) / 2) / (total - 2)) * rotationRange;
+    const offsetRange = 30;
+    const offset = Math.abs(
+      ((index - (total - 1) / 2) / (total - 2)) * offsetRange
+    );
+    return `translateY(${offset}px) rotate(${rotation}deg)`;
+  };
+
   return (
     <StyledGamerInterfaceCards width={viewedCardsWidth}>
       {gamerCards.map((card, index) => (
-        <Card
-          key={card.imageURL}
-          card={card}
+        <StyledCardWrapper
+          transform={stylizePlayerCard(gamerCards.length || 0, index)}
           left={index * cardsLeftPixels}
-          selected={defenderSelectedCard?.imageURL === card.imageURL}
-          isGamerCard
-          handleSelectCard={handleSelectCard}
-          handleUnselectCard={handleUnselectCard}
-        />
+        >
+          <Card
+            key={card.imageURL}
+            card={card}
+            selected={defenderSelectedCard?.imageURL === card.imageURL}
+            isGamerCard
+            handleSelectCard={handleSelectCard}
+            handleUnselectCard={handleUnselectCard}
+          />
+        </StyledCardWrapper>
       ))}
     </StyledGamerInterfaceCards>
   );

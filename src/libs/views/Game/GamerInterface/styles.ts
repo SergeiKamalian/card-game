@@ -16,6 +16,7 @@ export const StyledGamerInterfaceContent =styled.div`
     justify-content: center;
     display: flex;
     bottom: -50px;
+    bottom: 0;
     gap: 80px;
 `
 export const StyledGamerInfoWrapper = styled.div`
