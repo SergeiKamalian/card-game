@@ -12,13 +12,14 @@ export const ModalOverlay = styled(motion.div)`
   display: flex;
   justify-content: center;
   align-items: center;
+  backdrop-filter: blur(10px);
 `;
 export const ModalContainer = styled(motion.div)<{
   modalWidth: string;
   heightFitContent: boolean;
 }>`
   background: ${(p) => p.theme.gradients.form};
-  min-height: ${p => !p.heightFitContent && '70%'};
+  min-height: ${(p) => !p.heightFitContent && "70%"};
   overflow-y: auto;
   border-radius: 12px;
   width: ${(p) => p.modalWidth};

@@ -28,13 +28,15 @@ export const Authorization = memo(
 
     return (
       <Wrapper
-        background={theme.gradients.form}
-        padding='20px'
+        background={"#12141ec2"}
+        border={"1px solid #7a788130"}
+        blur="10px"
+        padding="20px"
         direction="column"
         minWidth="450px"
         gap={20}
-        withBoxShadow
         borderRadius="30px"
+        withBoxShadow
       >
         <Wrapper alignItems="center" gap={10}>
           <LuKeyRound color={theme.colors.white} size={30} />

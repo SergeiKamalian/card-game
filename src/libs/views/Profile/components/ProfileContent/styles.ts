@@ -6,8 +6,5 @@ export const StyledProfileContentWrapper = styled.div`
   padding: 50px;
   display: flex;
   justify-content: space-between;
-
-  @media (max-width: 1200px) {
-    gap: 30px;
-  }
+  gap: 30px;
 `;

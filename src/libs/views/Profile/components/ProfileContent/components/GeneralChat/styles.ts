@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const StyledGeneralChat = styled.div`
-  width: 30%;
+  width: 100%;
   height: 100%;
   background: ${(p) => p.theme.gradients.form};
   box-shadow: ${(p) => p.theme.shadows.primary};

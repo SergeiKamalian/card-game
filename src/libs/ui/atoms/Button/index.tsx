@@ -1,5 +1,5 @@
 import { ButtonHTMLAttributes, FC, ReactNode } from "react";
-import { StyledBadge, StyledButton, StyledButtonContent } from "./styles";
+import { StyledBadge, StyledButton } from "./styles";
 import { Text } from "../Text";
 
 export interface ButtonProps
@@ -43,9 +43,7 @@ export const Button: FC<ButtonProps> = (props) => {
       isCircle={isCircle}
       circleSize={circleSize}
     >
-      <StyledButtonContent className="button-content" type={type}>
-        {children}
-      </StyledButtonContent>
+      {children}
       {badge ? (
         <StyledBadge>
           <Text>{badge}</Text>

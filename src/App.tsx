@@ -6,6 +6,7 @@ import {
   AppProvider,
   Loading,
   AppLoadingProvider,
+  Background,
 } from "./libs";
 import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
@@ -21,8 +22,21 @@ function App() {
             <UserProvider>
               <FriendsProvider>
                 <div className="App">
-                  <Loading />
-                  <Routes />
+                  <div
+                    style={{
+                      zIndex: 10,
+                      position: "relative",
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Loading />
+                    <Routes />
+                  </div>
+                  <Background />
                 </div>
                 <ToastContainer />
               </FriendsProvider>

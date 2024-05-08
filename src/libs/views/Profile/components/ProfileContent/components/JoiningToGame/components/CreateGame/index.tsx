@@ -29,7 +29,7 @@ export const CreateGame = memo(() => {
       {({ values }) => {
         return (
           <Form>
-            <Wrapper direction="column" padding="20px 0 0" minWidth="100%" gap={30}>
+            <Wrapper direction="column" padding="10px 0 0" minWidth="100%" gap={10}>
               <Wrapper direction="column">
                 <Wrapper padding="0">
                   <FormField name="gamersCount" label="Gamers" />

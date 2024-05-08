@@ -2,30 +2,40 @@ import { memo } from "react";
 
 import styled, { keyframes } from "styled-components";
 import { useAppLoadingContext } from "../../../contexts";
+import { AnimatePresence, motion } from "framer-motion";
 
 export const Loading = memo(() => {
   const { appLoading } = useAppLoadingContext();
-  
-  if (!appLoading) return null;
 
   return (
-    <StyledLoadingWrapper data-name='loading-wrapper'>
-      <StyledLoader />
-    </StyledLoadingWrapper>
+    <AnimatePresence initial={false} onExitComplete={() => null}>
+      {appLoading && (
+        <StyledLoadingWrapper
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0, transition: { delay: 0.2 } }}
+          data-name="loading-wrapper"
+          $isLoading={appLoading}
+        />
+      )}
+    </AnimatePresence>
   );
 });
 
-const StyledLoadingWrapper = styled.div`
+const StyledLoadingWrapper = styled(motion.div)<{ $isLoading: boolean }>`
   position: fixed;
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(50px);
   display: flex;
   justify-content: center;
   align-items: center;
   left: 0;
   top: 0;
   z-index: 999;
+  transition: opacity 0.1s;
+  opacity: ${(p) => (p.$isLoading ? "1" : "0")};
 `;
 const rotate = keyframes`
   0% {
