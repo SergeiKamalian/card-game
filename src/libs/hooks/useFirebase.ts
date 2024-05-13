@@ -50,9 +50,7 @@ export const useFirebase = () => {
     const getRealtimeData = useCallback(async<T>(path: FIREBASE_PATHS, pathSegment: string): Promise<T | null> => {
         const db = getDatabase();
         const realtimeRef = ref(db, `${path}/${pathSegment}`);
-        console.log(realtimeRef)
         const snapshot = await get(realtimeRef);
-        console.log(snapshot)
         if (snapshot.exists()) {
             return snapshot.val() as T;
         }

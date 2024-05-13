@@ -26,7 +26,7 @@ import { getDatabase, onDisconnect, ref } from "firebase/database";
 import { notification } from "../ui";
 
 export const useGameConnection = () => {
-  const { user } = useUserContext();
+  const { user, changeUserCoinsCount, changeUser } = useUserContext();
   const { cards } = useAppContext();
   const { changeRealtimeData, getRealtimeData } = useFirebase();
   const navigate = useNavigate();
@@ -36,21 +36,27 @@ export const useGameConnection = () => {
     async (game: TGame) => {
       if (!user) return;
       try {
-        const gameData = await getRealtimeData<TGame>(FIREBASE_PATHS.GAMES, String(game.code));
+        const gameData = await getRealtimeData<TGame>(
+          FIREBASE_PATHS.GAMES,
+          String(game.code)
+        );
         const db = getDatabase();
         const gameRef = ref(db, `${FIREBASE_PATHS.GAMES}/${game.code}`);
         const disconnectRef = onDisconnect(gameRef);
         if (!gameData) return;
-        const updatedGamers = gameData.gamers.map(gamer => {
-          if (gamer.id === user.id) return {
-            ...gamer,
-            status: GAMER_STATUSES.SUSPENDED,
-          }
+        const updatedGamers = gameData.gamers.map((gamer) => {
+          if (gamer.id === user.id)
+            return {
+              ...gamer,
+              status: GAMER_STATUSES.SUSPENDED,
+            };
           return gamer;
-        })
-        const activeGamers = updatedGamers.filter(({ status }) => status === GAMER_STATUSES.ACTIVE);
+        });
+        const activeGamers = updatedGamers.filter(
+          ({ status }) => status === GAMER_STATUSES.ACTIVE
+        );
         if (!activeGamers.length) {
-          await disconnectRef.remove()
+          await disconnectRef.remove();
           return;
         }
         if (activeGamers.length === 1) {
@@ -58,15 +64,15 @@ export const useGameConnection = () => {
             ...gameData,
             gamers: updatedGamers,
             finishedGamersPlaces: [{ gamer: activeGamers[0], place: 1 }],
-            finished: true
-          }
-          await disconnectRef.set(gameDataWithSingleActiveGamer)
+            finished: true,
+          };
+          await disconnectRef.set(gameDataWithSingleActiveGamer);
           return;
         }
         const updatedData: TGame = {
           ...gameData,
-          gamers: updatedGamers
-        }
+          gamers: updatedGamers,
+        };
         disconnectRef.set(updatedData);
       } catch (error) {
         console.error(error);
@@ -124,8 +130,8 @@ export const useGameConnection = () => {
           finished: false,
           gamersTimes: {
             attackerFinishTime: null,
-            defenderFinishTime: null
-          }
+            defenderFinishTime: null,
+          },
         };
 
         await changeRealtimeData(
@@ -152,17 +158,20 @@ export const useGameConnection = () => {
         );
 
         if (!foundGame) {
-          notification(`Game with ${joiningForm.code} is not found`, 'error');
+          notification(`Game with ${joiningForm.code} is not found`, "error");
           return;
         }
 
         if (foundGame.coins > user.coins) {
-          notification(`You don't have that many coins`, 'error');
+          notification(`You don't have that many coins`, "error");
           return;
         }
 
         if (Number(foundGame.gamersCount) === foundGame.gamers.length) {
-          notification(`Game with code ${joiningForm.code} is crowded with players`, 'error');
+          notification(
+            `Game with code ${joiningForm.code} is crowded with players`,
+            "error"
+          );
           return;
         }
 
@@ -192,11 +201,12 @@ export const useGameConnection = () => {
           foundGame.trump.trump
         );
 
-        const gameTimes = started ? await getGameUpdatedTimes({
-          attackerMinutes: GAMERS_TIMES.ATTACKER,
-          gameId: joiningForm.code,
-        }) : null
-
+        const gameTimes = started
+          ? await getGameUpdatedTimes({
+              attackerMinutes: GAMERS_TIMES.ATTACKER,
+              gameId: joiningForm.code,
+            })
+          : null;
 
         const requestData: TGame = {
           ...foundGame,
@@ -210,8 +220,8 @@ export const useGameConnection = () => {
           ...(gameTimes && {
             gamersTimes: {
               attackerFinishTime: gameTimes.attackerFinishTime || null,
-              defenderFinishTime: gameTimes.defenderFinishTime || null
-            }
+              defenderFinishTime: gameTimes.defenderFinishTime || null,
+            },
           }),
         };
 
@@ -221,11 +231,28 @@ export const useGameConnection = () => {
           requestData
         );
         navigate(`${APP_ROUTES.GAME}/${requestData.code}`);
+
+        updatedGamers.forEach(async ({ id }) => {
+          const updatedUser = await changeUserCoinsCount(
+            id,
+            "decrement",
+            foundGame.coins
+          );
+          if (user.id === updatedUser?.id) changeUser(updatedUser);
+        });
       } catch (error) {
         console.error(error);
       }
     },
-    [changeRealtimeData, getGameUpdatedTimes, getRealtimeData, navigate, user]
+    [
+      changeRealtimeData,
+      changeUser,
+      changeUserCoinsCount,
+      getGameUpdatedTimes,
+      getRealtimeData,
+      navigate,
+      user,
+    ]
   );
 
   return {

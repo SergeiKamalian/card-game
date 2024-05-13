@@ -23,6 +23,11 @@ export const USER_CONTEXT_DEFAULT_VALUES = {
   userAuthStatus: false,
   user: null as TUser | null,
   changeUser: (user: TUser | null) => {},
+  changeUserCoinsCount: async (
+    id: number,
+    type: "increment" | "decrement",
+    coins: number
+  ) => ({} as TUser | undefined),
 };
 
 export const GAME_CONTEXT_DEFAULT_VALUES = {
