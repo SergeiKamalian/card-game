@@ -1,1 +1,2 @@
-export * from './FriendsContent'
+export * from "./FriendsContent";
+export * from "./GamesContent";

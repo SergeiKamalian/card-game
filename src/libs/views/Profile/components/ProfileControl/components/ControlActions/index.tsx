@@ -9,7 +9,7 @@ import {
   MODAL_SIZES,
   PROFILE_CONTROL_ACTIONS,
 } from "../../../../../../constants";
-import { FriendsContent } from "./components";
+import { FriendsContent, GamesContent } from "./components";
 import { useUserContext } from "../../../../../../contexts";
 
 export const ControlActions = memo(() => {
@@ -23,6 +23,8 @@ export const ControlActions = memo(() => {
     switch (openModal) {
       case PROFILE_CONTROL_ACTIONS.FRIENDS:
         return <FriendsContent />;
+      case PROFILE_CONTROL_ACTIONS.GAMES:
+        return <GamesContent />;
       default:
         return null;
     }
@@ -42,7 +44,11 @@ export const ControlActions = memo(() => {
         <Button isCircle circleSize={50}>
           <TbMessageCircle2Filled color={theme.colors.white} size={25} />
         </Button>
-        <Button isCircle circleSize={50}>
+        <Button
+          isCircle
+          circleSize={50}
+          onClick={() => setOpenModal(PROFILE_CONTROL_ACTIONS.GAMES)}
+        >
           <MdCasino color={theme.colors.white} size={25} />
         </Button>
       </Wrapper>
