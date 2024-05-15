@@ -11,6 +11,8 @@ import {
 export const APP_CONTEXT_DEFAULT_VALUES = {
   initializeApplication: () => {},
   cards: [] as TCard[] | null,
+  showNotification: false,
+  setShowNotification: (value: boolean) => {},
 };
 export const APP_LOADING_CONTEXT_DEFAULT_VALUES = {
   appLoading: false,

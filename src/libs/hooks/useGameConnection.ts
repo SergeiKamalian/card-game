@@ -85,6 +85,12 @@ export const useGameConnection = () => {
     async (creatingForm: TGameCreateRequest) => {
       try {
         if (!user || !cards) return;
+
+        if (creatingForm.coins > user.coins) {
+          notification(`You don't have that many coins`, "error");
+          return;
+        }
+
         //todo
         const testCards = cards.slice(0, 15);
 
