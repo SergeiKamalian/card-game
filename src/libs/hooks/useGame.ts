@@ -1,8 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router";
-import { TCard, TFinisherPlace, TGame, TGamer, TGamerStatus } from "../types";
-import { doc, onSnapshot } from "firebase/firestore";
-import { database } from "../configs";
+import { TCard, TGame, TGamer } from "../types";
 import { FIREBASE_PATHS, GAMERS_TIMES, GAMER_STATUSES } from "../constants";
 import { useUserContext } from "../contexts";
 import {
@@ -18,8 +16,8 @@ import { useFirebase } from "./useFirebase";
 import { useTimer } from "./useTimer";
 import { RootState, selectDefenderCard, unselectDefenderCard } from "../redux";
 import { useDispatch, useSelector } from "react-redux";
-import { notification } from "../ui";
-import { getDatabase, ref, onValue, get, set } from "firebase/database";
+import { getDatabase, ref, onValue } from "firebase/database";
+import { useNotification } from "../ui";
 
 export const useGame = () => {
   const { id } = useParams();
@@ -27,6 +25,8 @@ export const useGame = () => {
   const dispatch = useDispatch();
 
   const { user } = useUserContext();
+
+  const notification = useNotification();
 
   const defenderSelectedCard = useSelector(
     (store: RootState) => store.gameReducer.defenderSelectedCard

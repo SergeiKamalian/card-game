@@ -23,7 +23,7 @@ import {
 import { useNavigate } from "react-router";
 import { useTimer } from "./useTimer";
 import { getDatabase, onDisconnect, ref } from "firebase/database";
-import { notification } from "../ui";
+import { useNotification } from "../ui";
 
 export const useGameConnection = () => {
   const { user, changeUserCoinsCount, changeUser } = useUserContext();
@@ -31,6 +31,7 @@ export const useGameConnection = () => {
   const { changeRealtimeData, getRealtimeData } = useFirebase();
   const navigate = useNavigate();
   const { getGameUpdatedTimes } = useTimer();
+  const notification = useNotification();
 
   const disconnectUserFromGame = useCallback(
     async (game: TGame) => {

@@ -17,16 +17,17 @@ import {
 } from "../utils";
 import { useAppLoadingContext, useUserContext } from "../contexts";
 
-import { notification } from "../ui";
 import { useNavigate } from "react-router";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { database } from "../configs";
+import { useNotification } from "../ui";
 
 export const useAuthorization = () => {
   const { getData, changeData, deleteData, getCollection } = useFirebase();
   const { changeUser, userAuthStatus, user } = useUserContext();
   const { setAppLoading, setIsInitLoading } = useAppLoadingContext();
   const navigate = useNavigate();
+  const notification = useNotification();
 
   const getUserByUserName = useCallback(async (name: string) => {
     try {
@@ -69,8 +70,7 @@ export const useAuthorization = () => {
         setAppLoading(true);
         let foundUser = null;
         if (!currentUser && form) {
-
-          foundUser = await getUserByUserName(form.name)
+          foundUser = await getUserByUserName(form.name);
           if (!foundUser) {
             notification("User not found!", "error");
             return;
@@ -87,9 +87,13 @@ export const useAuthorization = () => {
         const token = generateToken(String(foundUser.id), 1, sessionToken);
 
         setCookie(COOKIES_KEYS.ACCESS_TOKEN, token);
-        await changeData(FIREBASE_PATHS.AUTHORIZED_USERS, String(foundUser.id), {
-          sessionToken,
-        });
+        await changeData(
+          FIREBASE_PATHS.AUTHORIZED_USERS,
+          String(foundUser.id),
+          {
+            sessionToken,
+          }
+        );
         changeUser(foundUser);
         notification("You have successfully logged in!", "success");
       } catch (error) {
@@ -141,8 +145,8 @@ export const useAuthorization = () => {
 
   const failedToAuthorizeUser = useCallback(() => {
     destroyCookie(COOKIES_KEYS.ACCESS_TOKEN);
-    navigate(APP_ROUTES.AUTHORIZATION)
-  }, [navigate])
+    navigate(APP_ROUTES.AUTHORIZATION);
+  }, [navigate]);
 
   const checkUserAuthStatus = useCallback(async () => {
     try {
@@ -159,7 +163,7 @@ export const useAuthorization = () => {
       const currentTime = new Date();
 
       if (currentTime > authStatusMaxDate) {
-        failedToAuthorizeUser()
+        failedToAuthorizeUser();
         return;
       }
 
@@ -168,17 +172,23 @@ export const useAuthorization = () => {
         userId
       );
       if (sessionToken !== foundAuthorizedUser?.sessionToken) {
-        failedToAuthorizeUser()
+        failedToAuthorizeUser();
         return;
       }
-      const foundedUser = await getData<TUser>(FIREBASE_PATHS.USERS, userId)
+      const foundedUser = await getData<TUser>(FIREBASE_PATHS.USERS, userId);
       foundedUser && (await authorizeUser({ currentUser: foundedUser }));
     } catch (error) {
       console.error(error);
     } finally {
       setIsInitLoading(false);
     }
-  }, [authorizeUser, failedToAuthorizeUser, getData, setIsInitLoading, userAuthStatus]);
+  }, [
+    authorizeUser,
+    failedToAuthorizeUser,
+    getData,
+    setIsInitLoading,
+    userAuthStatus,
+  ]);
 
   const logoutUser = useCallback(async () => {
     try {

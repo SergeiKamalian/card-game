@@ -4,13 +4,14 @@ import { TPersonalInformationRequest } from "../types";
 import { useFirebase } from "./useFirebase";
 import { FIREBASE_PATHS } from "../constants";
 import { useAuthorization } from "./useAuthorization";
-import { notification } from "../ui";
+import { useNotification } from "../ui";
 
 export const usePersonalInformation = () => {
   const { user, changeUser } = useUserContext();
   const { setAppLoading } = useAppLoadingContext();
   const { changeData } = useFirebase();
   const { getUserByUserName } = useAuthorization();
+  const notification = useNotification();
 
   const initialValues: TPersonalInformationRequest | null = useMemo(() => {
     if (!user) return null;

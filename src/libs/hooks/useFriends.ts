@@ -1,24 +1,26 @@
 import { useCallback, useState } from "react";
 import { useAppLoadingContext, useUserContext } from "../contexts";
-import { TConnectedUser, TFriendFindRequest, TNotification, TUser } from "../types";
+import { TConnectedUser, TFriendFindRequest, TUser } from "../types";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { database } from "../configs";
 import { FIREBASE_PATHS, GAME_REQUEST_TIME } from "../constants";
 import { useFirebase } from "./useFirebase";
-import { notification } from "../ui";
 import { calculateGamerStepTime } from "../utils";
 import { useGameConnection } from "./useGameConnection";
+import { useNotification } from "../ui";
 
 export const useFriends = () => {
   const { setAppLoading } = useAppLoadingContext();
   const { user: currentUser, changeUser } = useUserContext();
   const { joinToGame } = useGameConnection();
+  const notification = useNotification();
   const [friendsRequests, setFriendsRequests] = useState<TUser[]>([]);
   const [userFriends, setUserFriends] = useState<TUser[]>([]);
 
   const [foundUsers, setFoundUsers] = useState<TUser[]>([]);
 
-  const { changeData, getData, getRealtimeData, changeRealtimeData } = useFirebase();
+  const { changeData, getData, getRealtimeData, changeRealtimeData } =
+    useFirebase();
 
   const findFriends = useCallback(
     async (values: TFriendFindRequest) => {
@@ -212,7 +214,10 @@ export const useFriends = () => {
       if (!currentUser) return;
       try {
         setAppLoading(true);
-        const foundData = await getRealtimeData<TConnectedUser>(FIREBASE_PATHS.CONNECTED_USERS, String(userId));
+        const foundData = await getRealtimeData<TConnectedUser>(
+          FIREBASE_PATHS.CONNECTED_USERS,
+          String(userId)
+        );
 
         if (!foundData) return;
 
@@ -229,7 +234,11 @@ export const useFriends = () => {
         };
         const newData = { ...foundData, gameRequest };
 
-        await changeRealtimeData(FIREBASE_PATHS.CONNECTED_USERS, String(userId), newData)
+        await changeRealtimeData(
+          FIREBASE_PATHS.CONNECTED_USERS,
+          String(userId),
+          newData
+        );
         notification("Game request successfully sended!", "success");
       } catch (error) {
         console.error(error);
@@ -244,10 +253,17 @@ export const useFriends = () => {
     if (!currentUser) return;
     try {
       setAppLoading(true);
-      const foundData = await getRealtimeData<TConnectedUser>(FIREBASE_PATHS.CONNECTED_USERS, String(currentUser.id));
+      const foundData = await getRealtimeData<TConnectedUser>(
+        FIREBASE_PATHS.CONNECTED_USERS,
+        String(currentUser.id)
+      );
       if (!foundData) return;
-      delete foundData.gameRequest
-      await changeRealtimeData(FIREBASE_PATHS.CONNECTED_USERS, String(currentUser.id), foundData)
+      delete foundData.gameRequest;
+      await changeRealtimeData(
+        FIREBASE_PATHS.CONNECTED_USERS,
+        String(currentUser.id),
+        foundData
+      );
     } catch (error) {
       console.error(error);
     } finally {
@@ -259,17 +275,30 @@ export const useFriends = () => {
     if (!currentUser) return;
     try {
       setAppLoading(true);
-      const foundData = await getRealtimeData<TConnectedUser>(FIREBASE_PATHS.CONNECTED_USERS, String(currentUser.id));
+      const foundData = await getRealtimeData<TConnectedUser>(
+        FIREBASE_PATHS.CONNECTED_USERS,
+        String(currentUser.id)
+      );
       if (!foundData?.gameRequest) return;
       await joinToGame({ code: String(foundData.gameRequest.id) });
-      delete foundData.gameRequest
-      await changeRealtimeData(FIREBASE_PATHS.CONNECTED_USERS, String(currentUser.id), foundData)
+      delete foundData.gameRequest;
+      await changeRealtimeData(
+        FIREBASE_PATHS.CONNECTED_USERS,
+        String(currentUser.id),
+        foundData
+      );
     } catch (error) {
       console.error(error);
     } finally {
       setAppLoading(false);
     }
-  }, [changeRealtimeData, currentUser, getRealtimeData, joinToGame, setAppLoading]);
+  }, [
+    changeRealtimeData,
+    currentUser,
+    getRealtimeData,
+    joinToGame,
+    setAppLoading,
+  ]);
 
   return {
     foundUsers,
@@ -283,6 +312,6 @@ export const useFriends = () => {
     initUserFriends,
     sendGameRequestToFriend,
     rejectGameRequest,
-    acceptGameRequest
+    acceptGameRequest,
   };
 };
