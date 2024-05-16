@@ -11,7 +11,7 @@ import {
   StyledModalContainerContent,
 } from "./styles";
 import { MODAL_SIZES, MODAL_WIDTHS, modal } from "../../../constants";
-import { useOnClickOutside } from "../../functions";
+import { useKeyPressEvent, useOnClickOutside } from "../../functions";
 import { ModalHeader } from "./components";
 import bg from "../../../assets/images/bgImage.webp";
 import { IoMdClose } from "react-icons/io";
@@ -36,6 +36,7 @@ export const Modal = memo((props: ModalProps) => {
   } = props;
   const modalRef = useRef(null);
   useOnClickOutside({ ref: modalRef, handler: onClose });
+  useKeyPressEvent("Escape", onClose);
 
   const modalWidth = useMemo(() => MODAL_WIDTHS[size], [size]);
 
