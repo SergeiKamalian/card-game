@@ -3,7 +3,7 @@ import { ReactNode, memo, useMemo, useRef } from "react";
 import { ModalContainer, ModalOverlay, StyledModalBody } from "./styles";
 import { MODAL_SIZES, MODAL_WIDTHS, modal } from "../../../constants";
 import { useOnClickOutside } from "../../functions";
-import { ModalHeader } from "./components";
+import { ModalFooter, ModalHeader } from "./components";
 
 interface ModalProps {
   isOpen: boolean;
@@ -50,6 +50,7 @@ export const Modal = memo((props: ModalProps) => {
           >
             <ModalHeader action={action} onClose={onClose} title={title} />
             <StyledModalBody>{content}</StyledModalBody>
+            <ModalFooter />
           </ModalContainer>
         </ModalOverlay>
       )}

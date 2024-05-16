@@ -18,15 +18,18 @@ export const ModalContainer = styled(motion.div)<{
   modalWidth: string;
   heightFitContent: boolean;
 }>`
-  background: ${(p) => p.theme.gradients.form};
+  background: ${(p) => p.theme.colors.tertiary};
   min-height: ${(p) => !p.heightFitContent && "70%"};
   overflow-y: auto;
-  border-radius: 12px;
+  border-radius: 15px;
   width: ${(p) => p.modalWidth};
   max-height: calc(100vh - 20px);
   box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5);
   z-index: 901;
+  position: relative;
+  padding-bottom: 30px;
 `;
 export const StyledModalBody = styled.div`
   padding: 20px;
+  background: ${(p) => p.theme.colors.tertiary};
 `;

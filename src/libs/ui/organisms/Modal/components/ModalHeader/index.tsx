@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { StyledModalHeader, StyledModalHeaderLeftSlide } from "./styles";
+import { StyledBottomLine, StyledModalHeader, StyledModalHeaderLeftSlide, StyledTopLine } from "./styles";
 import { Button, Text } from "../../../../atoms";
 import { IoMdClose } from "react-icons/io";
 import { useTheme } from "styled-components";
@@ -15,6 +15,8 @@ export const ModalHeader = memo((props: ModalHeaderProps) => {
   const theme = useTheme();
   return (
     <StyledModalHeader isCenterContent={!onClose}>
+      <StyledTopLine />
+      <StyledBottomLine />
       {onClose ? (
         <StyledModalHeaderLeftSlide>
           <button onClick={onClose}>
