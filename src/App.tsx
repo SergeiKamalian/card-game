@@ -8,6 +8,7 @@ import {
   AppLoadingProvider,
   Background,
   Notification,
+  Timer,
 } from "./libs";
 import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
@@ -39,6 +40,7 @@ function App() {
                   </div>
                   <Background />
                   <Notification />
+                  <Timer />
                 </div>
                 <ToastContainer />
               </FriendsProvider>

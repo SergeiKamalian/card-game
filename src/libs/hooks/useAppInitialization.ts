@@ -7,6 +7,7 @@ export const useAppInitialization = () => {
   const { getCollection } = useFirebase();
   const [cards, setCards] = useState<null | TCard[]>(null);
   const [showNotification, setShowNotification] = useState(false);
+  const [timerTexts, setTimerTexts] = useState<(string | number)[]>([]);
 
   const initializeApplication = useCallback(async () => {
     try {
@@ -20,7 +21,9 @@ export const useAppInitialization = () => {
   return {
     initializeApplication,
     setShowNotification,
+    setTimerTexts,
     cards,
     showNotification,
+    timerTexts,
   };
 };

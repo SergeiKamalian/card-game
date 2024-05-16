@@ -13,6 +13,8 @@ export const APP_CONTEXT_DEFAULT_VALUES = {
   cards: [] as TCard[] | null,
   showNotification: false,
   setShowNotification: (value: boolean) => {},
+  setTimerTexts: (value: (number | string)[]) => {},
+  timerTexts: [] as (number | string)[],
 };
 export const APP_LOADING_CONTEXT_DEFAULT_VALUES = {
   appLoading: false,

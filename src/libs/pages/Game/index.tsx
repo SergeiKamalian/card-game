@@ -16,6 +16,7 @@ import {
 } from "../../views";
 import { useGameConnection } from "../../hooks/useGameConnection";
 import { Modal } from "../../ui";
+import { useViewTimer } from "../../ui/hooks/useViewTimer";
 
 const GameComponent = memo(() => {
   const {
@@ -32,6 +33,8 @@ const GameComponent = memo(() => {
     followTheDefenderTime,
   } = useTimerContext();
 
+  const startViewTimer = useViewTimer({ finishText: "Game started!", seconds: 3 });
+
   const { disconnectUserFromGame } = useGameConnection();
 
   useEffect(followToGame, [followToGame]);
@@ -42,18 +45,18 @@ const GameComponent = memo(() => {
 
   useEffect(followTheGameTimes, [followTheGameTimes]);
 
+  useEffect(() => {    
+    if (game?.started) startViewTimer();
+  }, [game?.started]);
+
   useEffect(() => {
     if (!game) return;
     // disconnectUserFromGame(game);
   }, [disconnectUserFromGame, game]);
 
-  console.log(game)
-
   if (!game?.started) {
     return <Starting />;
   }
-
-  console.log(game)
 
   if (!userGamer || !gameTimes || !game) {
     return null;
@@ -71,7 +74,7 @@ const GameComponent = memo(() => {
           />
           <BitoCards game={game} />
         </StyledGameTopBlock>
-         <GameTable />
+        <GameTable />
         <GamerInterface
           game={game}
           restGamers={restGamers}
