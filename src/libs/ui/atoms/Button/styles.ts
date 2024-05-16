@@ -5,6 +5,7 @@ interface ButtonProps {
   size: "normal" | "small" | "big";
   isCircle?: boolean;
   circleSize?: number;
+  widthFitContent: boolean;
 }
 
 export const StyledButton = styled.button<ButtonProps>`
@@ -27,6 +28,8 @@ export const StyledButton = styled.button<ButtonProps>`
   justify-content: center;
   transition: all 0.4s;
   width: ${(p) => (p.isCircle ? `${p.circleSize}px` : "95%")};
+  width: ${p => p.widthFitContent && 'fit-content'};
+  padding: ${p => !p.isCircle && '0 20px'};
   margin: 0 auto;
   margin: 10px 0;
 

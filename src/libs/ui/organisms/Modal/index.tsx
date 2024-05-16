@@ -1,9 +1,20 @@
 import { AnimatePresence } from "framer-motion";
 import { ReactNode, memo, useMemo, useRef } from "react";
-import { ModalContainer, ModalOverlay, StyledModalBody } from "./styles";
+import {
+  ModalContainer,
+  ModalOverlay,
+  StyledBgImage,
+  StyledCloseButton,
+  StyledContent,
+  StyledInnerContent,
+  StyledInnerContentBg,
+  StyledModalContainerContent,
+} from "./styles";
 import { MODAL_SIZES, MODAL_WIDTHS, modal } from "../../../constants";
 import { useOnClickOutside } from "../../functions";
-import { ModalFooter, ModalHeader } from "./components";
+import { ModalHeader } from "./components";
+import bg from "../../../assets/images/bgImage.webp";
+import { IoMdClose } from "react-icons/io";
 
 interface ModalProps {
   isOpen: boolean;
@@ -11,7 +22,6 @@ interface ModalProps {
   size?: MODAL_SIZES;
   title: string;
   content: ReactNode;
-  action?: () => void;
   heightFitContent?: boolean;
 }
 
@@ -21,9 +31,8 @@ export const Modal = memo((props: ModalProps) => {
     onClose,
     size = MODAL_SIZES.MEDIUM,
     title,
+    heightFitContent = false,
     content,
-    action,
-    heightFitContent = false
   } = props;
   const modalRef = useRef(null);
   useOnClickOutside({ ref: modalRef, handler: onClose });
@@ -43,14 +52,25 @@ export const Modal = memo((props: ModalProps) => {
             initial="hidden"
             animate="visible"
             exit="exit"
-            ref={modalRef}
             id="modal-container"
-            modalWidth={modalWidth}
-            heightFitContent={heightFitContent}
           >
-            <ModalHeader action={action} onClose={onClose} title={title} />
-            <StyledModalBody>{content}</StyledModalBody>
-            <ModalFooter />
+            <StyledModalContainerContent
+              modalWidth={modalWidth}
+              heightFitContent={heightFitContent}
+              ref={modalRef}
+            >
+              <ModalHeader title={title} />
+              <StyledInnerContent>
+                <StyledInnerContentBg src={bg} />
+                <StyledContent>{content}</StyledContent>
+              </StyledInnerContent>
+              <StyledBgImage src={bg} />
+              {onClose ? (
+                <StyledCloseButton onClick={onClose}>
+                  <IoMdClose size={30} />
+                </StyledCloseButton>
+              ) : null}
+            </StyledModalContainerContent>
           </ModalContainer>
         </ModalOverlay>
       )}

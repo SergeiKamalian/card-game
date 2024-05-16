@@ -1,37 +1,25 @@
 import styled from "styled-components";
 
-export const StyledModalHeader = styled.div<{ isCenterContent: boolean }>`
-  width: 100%;
-  height: 70px;
-  display: flex;
-  align-items: center;
-  justify-content: ${(p) => (p.isCenterContent ? "center" : "space-between")};
-  padding: 0 20px;
-  position: relative;
-  background: ${p=> p.theme.gradients.form};
-`;
-export const StyledModalHeaderLeftSlide = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  > button {
-    background: none;
-    height: 30px;
-    cursor: pointer;
-  }
-`;
-export const StyledTopLine = styled.div`
+export const StyledHeader = styled.div`
   position: absolute;
-  top: 0;
+  padding: 0 20px;
+  width: fit-content;
+  height: 80px;
+  transform: translate(-50%, 0px) skew(0deg, 0deg);
+  position: absolute;
   left: 50%;
-  transform: translateX(-50%);
-  height: 2px;
-  width: 60%;
-  background: linear-gradient(to left, transparent, #3e4a82, transparent);
+  top: -40px;
+  background: rgb(18 20 30);
+  box-shadow: ${(p) => p.theme.shadows.primary};
+  border: 1px solid #7a788130;
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 40px;
+  color: white;
+  font-family: "KnightWarrior";
+  text-wrap: nowrap;
 `;
-export const StyledBottomLine = styled(StyledTopLine)`
-  top: unset;
-  bottom: -1px;
-  width: 100%;
-  height: 2px;
-`

@@ -86,16 +86,24 @@ export const RestGamer = memo((props: RestGamerProps) => {
     [game?.defender, game?.defenderSurrendered, restGamer?.info.name]
   );
 
+  const finishedPlace = useMemo(
+    () =>
+      game.finishedGamersPlaces?.find(
+        ({ gamer }) => gamer.id === restGamer?.id
+      )?.place,
+    [game.finishedGamersPlaces, restGamer?.id]
+  );
+
   return (
     <StyledRestGamer
       onClick={onInvite}
       disabled={gamerIsDisabled}
       isInvite={!!onInvite}
     >
-      {gamerIsFinished ? (
+      {(gamerIsFinished && finishedPlace) ? (
         <StyledDisconnectWrapper>
           <StyledWinnerWrapper>
-            <Winner winnerPosition={2} />
+            <Winner winnerPosition={finishedPlace} />
           </StyledWinnerWrapper>
         </StyledDisconnectWrapper>
       ) : null}

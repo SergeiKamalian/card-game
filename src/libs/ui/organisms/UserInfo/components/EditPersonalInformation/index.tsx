@@ -6,6 +6,7 @@ import { usePersonalInformation } from "../../../../../hooks";
 import { PERSONAL_INFORMATION_SCHEMA } from "../../../../../constants";
 import { Modal } from "../../../Modal";
 import { TPersonalInformationRequest } from "../../../../../types";
+import { Button, Text, Wrapper } from "../../../../atoms";
 
 interface EditPersonalInformationProps {
   isOpen: boolean;
@@ -30,14 +31,17 @@ export const EditPersonalInformation = memo(
       []
     );
 
-    const editHandler = useCallback(async (values: TPersonalInformationRequest) => {
-      try {
-        await editPersonalInformation(values)
-        setIsOpen(false)
-      } catch (error) {
-        console.error(error)
-      }
-    }, [editPersonalInformation, setIsOpen]);
+    const editHandler = useCallback(
+      async (values: TPersonalInformationRequest) => {
+        try {
+          await editPersonalInformation(values);
+          setIsOpen(false);
+        } catch (error) {
+          console.error(error);
+        }
+      },
+      [editPersonalInformation, setIsOpen]
+    );
 
     if (!initialValues) return null;
 
@@ -55,8 +59,14 @@ export const EditPersonalInformation = memo(
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
             title="Personal information"
-            content={<Tabs tabs={tabs} />}
-            action={() => handleSubmit()}
+            content={
+              <Wrapper padding="0" minWidth="100%" direction="column" gap={20}>
+                <Tabs tabs={tabs} />
+                <Button widthFitContent onClick={() => handleSubmit()}>
+                  <Text cursor="pointer" fz={20}>Save information</Text>
+                </Button>
+              </Wrapper>
+            }
           />
         )}
       </Formik>

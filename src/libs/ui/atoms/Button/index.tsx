@@ -17,6 +17,7 @@ export interface ButtonProps
   isCircle?: boolean;
   circleSize?: number;
   badge?: string | number;
+  widthFitContent?: boolean;
 }
 
 export const Button: FC<ButtonProps> = (props) => {
@@ -31,6 +32,7 @@ export const Button: FC<ButtonProps> = (props) => {
     circleSize,
     badge,
     children,
+    widthFitContent = false,
     ...rest
   } = props;
 
@@ -42,6 +44,7 @@ export const Button: FC<ButtonProps> = (props) => {
       size={size}
       isCircle={isCircle}
       circleSize={circleSize}
+      widthFitContent={widthFitContent}
     >
       {children}
       {badge ? (
