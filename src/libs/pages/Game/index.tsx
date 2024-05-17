@@ -13,6 +13,7 @@ import {
   RemainingCards,
   BitoCards,
   Starting,
+  GamerFinished,
 } from "../../views";
 import { useGameConnection } from "../../hooks/useGameConnection";
 import { Modal } from "../../ui";
@@ -45,9 +46,9 @@ const GameComponent = memo(() => {
 
   useEffect(followTheGameTimes, [followTheGameTimes]);
 
-  useEffect(() => {    
-    if (game?.started) startViewTimer();
-  }, [game?.started]);
+  // useEffect(() => {    
+  //   if (game?.started) startViewTimer();
+  // }, [game?.started]);
 
   useEffect(() => {
     if (!game) return;
@@ -81,6 +82,7 @@ const GameComponent = memo(() => {
           gameTimes={gameTimes}
         />
       </StyledGame>
+      <GamerFinished />
       {/* <Modal
         isOpen={gameIsFinished}
         content={<span>finished</span>}
