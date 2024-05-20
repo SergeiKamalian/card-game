@@ -195,11 +195,21 @@ export const useGame = () => {
         const { finishedPlaces, gameIsFinished, gamers } =
           checkGamerFinishStatus(newGame, currentGamer.info.name);
 
+        const gamerIsFinishGame = finishedPlaces?.find(
+          ({ gamer }) => gamer.id === currentGamer.id
+        );
+
+        let readyAttacker = newGame.attacker;
+        if (!!gamerIsFinishGame) {
+          readyAttacker = recognizeAttackerOnTransferPlace(newGame);
+        }
+
         const updatedGame: TGame = {
           ...newGame,
           finishedGamersPlaces: finishedPlaces,
           finished: gameIsFinished,
           gamers,
+          attacker: readyAttacker,
         };
 
         await updateGame(updatedGame);
@@ -212,6 +222,7 @@ export const useGame = () => {
       currentGamer,
       game,
       getGameUpdatedTimes,
+      notification,
       updateGame,
     ]
   );
