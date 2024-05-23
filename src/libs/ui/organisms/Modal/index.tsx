@@ -8,9 +8,15 @@ import {
   StyledContent,
   StyledInnerContent,
   StyledInnerContentBg,
+  StyledModalBgImage,
   StyledModalContainerContent,
 } from "./styles";
-import { MODAL_SIZES, MODAL_WIDTHS, modal } from "../../../constants";
+import {
+  MODAL_SIZES,
+  MODAL_WIDTHS,
+  modal,
+  modalBackground,
+} from "../../../constants";
 import { useKeyPressEvent, useOnClickOutside } from "../../functions";
 import { ModalHeader } from "./components";
 import bg from "../../../assets/images/bgImage.webp";
@@ -20,9 +26,12 @@ interface ModalProps {
   isOpen: boolean;
   onClose?: () => void;
   size?: MODAL_SIZES;
-  title: string;
+  title?: string;
   content: ReactNode;
   heightFitContent?: boolean;
+  isFullscreen?: boolean;
+  bgImage?: string;
+  customHeader?: ReactNode;
 }
 
 export const Modal = memo((props: ModalProps) => {
@@ -30,9 +39,12 @@ export const Modal = memo((props: ModalProps) => {
     isOpen,
     onClose,
     size = MODAL_SIZES.MEDIUM,
-    title,
+    title = '',
     heightFitContent = false,
     content,
+    isFullscreen = false,
+    bgImage,
+    customHeader = null,
   } = props;
   const modalRef = useRef(null);
   useOnClickOutside({ ref: modalRef, handler: onClose });
@@ -59,8 +71,9 @@ export const Modal = memo((props: ModalProps) => {
               modalWidth={modalWidth}
               heightFitContent={heightFitContent}
               ref={modalRef}
+              isFullscreen={isFullscreen}
             >
-              <ModalHeader title={title} />
+              {customHeader || <ModalHeader title={title} />}
               <StyledInnerContent>
                 <StyledInnerContentBg src={bg} />
                 <StyledContent>{content}</StyledContent>
@@ -73,6 +86,16 @@ export const Modal = memo((props: ModalProps) => {
               ) : null}
             </StyledModalContainerContent>
           </ModalContainer>
+          {bgImage ? (
+            <StyledModalBgImage
+              variants={modalBackground}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              src={bgImage}
+              alt="Bg image"
+            />
+          ) : null}
         </ModalOverlay>
       )}
     </AnimatePresence>

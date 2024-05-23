@@ -7,13 +7,14 @@ interface ResourceTrackerProps {
   image: string;
   count: number;
   action?: ReactNode;
+  isSlotItem?: boolean;
 }
 
 export const ResourceTracker = memo((props: ResourceTrackerProps) => {
-  const { count, image } = props;
+  const { count, image, isSlotItem = false } = props;
 
   return (
-    <StyledResourceTracker>
+    <StyledResourceTracker isSlotItem={isSlotItem}>
       <Image alt="coins" height="60px" width="60px" url={image} />
       <Wrapper padding="0" minHeight="100%" alignItems="center">
         <Text fw={600}>{numberWithSpaces(count)}</Text>

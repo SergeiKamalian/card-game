@@ -8,3 +8,8 @@ export const StyledProfileContentWrapper = styled.div`
   justify-content: space-between;
   gap: 30px;
 `;
+export const StyledColumn = styled.div`
+  width: 100%;
+  display: flex;
+  height: 100%;
+`

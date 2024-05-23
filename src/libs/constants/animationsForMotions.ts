@@ -22,3 +22,12 @@ export const modal = {
     },
   },
 };
+
+export const modalBackground = {
+  ...modal,
+  visible: {
+    ...modal.visible,
+    y: "0",
+    x: "0",
+  },
+};
